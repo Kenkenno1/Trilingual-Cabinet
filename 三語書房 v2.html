@@ -1,0 +1,4926 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>三語書房 v2 | EN / ZH-TW / JA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..700,0..100;1,9..144,400..700,0..100&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400;500;600;700&amp;family=Noto+Serif+JP:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       TRILINGUAL CABINET · v2 — Editorial Translator Workspace
+       Bold borders, accent stripes, per-language identity.
+       ============================================================ */
+
+    /* ===== Theme: INK (dark, default) ===== */
+    [data-theme="dark"]{
+      --bg:#07090d;
+      --bg-2:#0a0e14;
+      --panel:#0c1118;
+      --panel-2:#0f141d;
+      --elev:#141a25;
+
+      /* Borders — high-contrast, definitive */
+      --rule:rgba(255,255,255,0.22);
+      --rule-strong:rgba(255,255,255,0.38);
+      --rule-soft:rgba(255,255,255,0.10);
+      --rule-hair:rgba(255,255,255,0.05);
+
+      /* Type */
+      --text:rgba(255,255,255,0.96);
+      --muted:rgba(255,255,255,0.62);
+      --faint:rgba(255,255,255,0.40);
+
+      /* Per-panel accents — saffron / sea-ink / vermilion */
+      --accent-src:#e8b961;
+      --accent-src-bg:rgba(232,185,97,0.08);
+      --accent-src-line:rgba(232,185,97,0.42);
+      --accent-src-glow:rgba(232,185,97,0.30);
+
+      --accent-t1:#6dcfd9;
+      --accent-t1-bg:rgba(109,207,217,0.07);
+      --accent-t1-line:rgba(109,207,217,0.40);
+      --accent-t1-glow:rgba(109,207,217,0.28);
+
+      --accent-t2:#e87b6f;
+      --accent-t2-bg:rgba(232,123,111,0.07);
+      --accent-t2-line:rgba(232,123,111,0.42);
+      --accent-t2-glow:rgba(232,123,111,0.30);
+
+      --t1Color:rgba(196,232,237,0.96);
+      --t2Color:rgba(245,212,206,0.96);
+
+      /* Status */
+      --danger:#f87171;
+      --dangerBg:rgba(248,113,113,0.12);
+      --dangerBd:rgba(248,113,113,0.36);
+      --success:#4ade80;
+      --successBg:rgba(74,222,128,0.12);
+      --blue:#60a5fa;
+      --blueBg:rgba(96,165,250,0.12);
+      --blueBd:rgba(96,165,250,0.40);
+
+      --reverseBg:rgba(168,85,247,0.07);
+      --reverseBd:rgba(168,85,247,0.32);
+      --reverseText:rgba(228,216,248,0.92);
+
+      --diffAdd:rgba(74,222,128,0.22);
+      --diffDel:rgba(248,113,113,0.18);
+      --diffDelText:rgba(255,255,255,0.36);
+
+      --chipBg:rgba(255,255,255,0.03);
+      --chipBd:rgba(255,255,255,0.16);
+      --focus:rgba(255,255,255,0.30);
+
+      --toastBg:rgba(15,18,24,0.96);
+      --toastBd:rgba(255,255,255,0.20);
+      --skelBar:rgba(255,255,255,0.06);
+
+      --bodyBg:
+        radial-gradient(1200px 800px at 8% -10%, rgba(232,185,97,0.05), transparent 55%),
+        radial-gradient(900px 700px at 105% 110%, rgba(109,207,217,0.04), transparent 50%),
+        radial-gradient(800px 600px at 50% 50%, rgba(232,123,111,0.025), transparent 60%),
+        var(--bg);
+      --grain-opacity:0.5;
+    }
+
+    /* ===== Theme: VELLUM (light, warm cream) ===== */
+    [data-theme="light"]{
+      --bg:#ece4d2;
+      --bg-2:#f1ead9;
+      --panel:#f9f3e3;
+      --panel-2:#f5efde;
+      --elev:#fffdf6;
+
+      --rule:rgba(40,30,20,0.28);
+      --rule-strong:rgba(40,30,20,0.50);
+      --rule-soft:rgba(40,30,20,0.12);
+      --rule-hair:rgba(40,30,20,0.05);
+
+      --text:rgba(28,22,14,0.92);
+      --muted:rgba(28,22,14,0.58);
+      --faint:rgba(28,22,14,0.36);
+
+      --accent-src:#a86d18;
+      --accent-src-bg:rgba(168,109,24,0.08);
+      --accent-src-line:rgba(168,109,24,0.50);
+      --accent-src-glow:rgba(168,109,24,0.20);
+
+      --accent-t1:#176870;
+      --accent-t1-bg:rgba(23,104,112,0.07);
+      --accent-t1-line:rgba(23,104,112,0.45);
+      --accent-t1-glow:rgba(23,104,112,0.18);
+
+      --accent-t2:#8a2620;
+      --accent-t2-bg:rgba(138,38,32,0.07);
+      --accent-t2-line:rgba(138,38,32,0.48);
+      --accent-t2-glow:rgba(138,38,32,0.20);
+
+      --t1Color:rgba(20,75,82,0.94);
+      --t2Color:rgba(110,30,25,0.94);
+
+      --danger:#b91c1c;
+      --dangerBg:rgba(185,28,28,0.08);
+      --dangerBd:rgba(185,28,28,0.30);
+      --success:#15803d;
+      --successBg:rgba(21,128,61,0.10);
+      --blue:#1d4ed8;
+      --blueBg:rgba(29,78,216,0.07);
+      --blueBd:rgba(29,78,216,0.34);
+
+      --reverseBg:rgba(91,33,182,0.05);
+      --reverseBd:rgba(91,33,182,0.30);
+      --reverseText:rgba(59,27,112,0.88);
+
+      --diffAdd:rgba(21,128,61,0.18);
+      --diffDel:rgba(185,28,28,0.14);
+      --diffDelText:rgba(28,22,14,0.36);
+
+      --chipBg:rgba(28,22,14,0.04);
+      --chipBd:rgba(28,22,14,0.18);
+      --focus:rgba(28,22,14,0.34);
+
+      --toastBg:rgba(255,253,247,0.98);
+      --toastBd:rgba(28,22,14,0.22);
+      --skelBar:rgba(28,22,14,0.07);
+
+      --bodyBg:
+        radial-gradient(1200px 800px at 8% -10%, rgba(168,109,24,0.08), transparent 55%),
+        radial-gradient(900px 700px at 105% 110%, rgba(23,104,112,0.05), transparent 50%),
+        radial-gradient(800px 600px at 50% 50%, rgba(138,38,32,0.03), transparent 60%),
+        var(--bg);
+      --grain-opacity:0.35;
+    }
+
+    :root{
+      --split:0.5;
+      --dividerW:14px;
+      --chatW:380px;
+      --radius:7px;
+      --radius-lg:10px;
+
+      --font-display:'Fraunces','Noto Serif TC','Noto Serif JP',Georgia,serif;
+      --font-body:'Inter','Noto Serif TC','Noto Serif JP',system-ui,-apple-system,Segoe UI,sans-serif;
+      --font-serif:'Noto Serif TC','Noto Serif JP','Fraunces',Georgia,serif;
+      --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Consolas,monospace;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bodyBg);
+      color:var(--text);
+      font-family:var(--font-body);
+      font-feature-settings:'kern','ss01','cv11';
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+    }
+
+    /* Atmospheric paper-grain */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:
+        radial-gradient(circle at 22% 30%, var(--rule-hair) 0.5px, transparent 1.5px),
+        radial-gradient(circle at 78% 65%, var(--rule-hair) 0.5px, transparent 1.5px),
+        radial-gradient(circle at 50% 90%, var(--rule-hair) 0.5px, transparent 1.5px);
+      background-size:90px 90px,140px 140px,180px 180px;
+      background-position:0 0,45px 45px,20px 70px;
+      opacity:var(--grain-opacity);
+      z-index:0;
+    }
+
+    .wrap{
+      position:relative;
+      max-width:1340px;
+      margin:0 auto;
+      padding:18px 24px 16px;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      z-index:2;
+      transition:max-width 240ms ease,margin 240ms ease,padding 240ms ease;
+    }
+    body.chat-open .wrap{
+      max-width:none;
+      width:calc(100vw - var(--chatW));
+      margin:0;
+      padding-right:16px;
+    }
+
+    /* ============================================================
+       MASTHEAD — Editorial top-bar
+       ============================================================ */
+    .toprow{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      padding:0 0 14px 0;
+      margin-bottom:14px;
+      border-bottom:1.5px solid var(--rule);
+      position:relative;
+    }
+    .toprow::after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:-4.5px;
+      height:1px;
+      background:var(--rule-soft);
+    }
+
+    .masthead{
+      display:flex;
+      align-items:baseline;
+      gap:14px;
+      margin-right:auto;
+      flex-wrap:wrap;
+    }
+    .masthead .wordmark{
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:26px;
+      letter-spacing:-0.01em;
+      color:var(--text);
+      font-variation-settings:'opsz' 144,'SOFT' 50;
+      line-height:1;
+      font-style:italic;
+    }
+    .masthead .subtitle{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.30em;
+      text-transform:uppercase;
+      color:var(--faint);
+      padding-bottom:3px;
+    }
+    .masthead .langs{
+      display:inline-flex;
+      align-items:center;
+      gap:0;
+      font-family:var(--font-mono);
+      font-size:11px;
+      letter-spacing:0.18em;
+      padding-bottom:3px;
+      font-weight:600;
+    }
+    .masthead .langs .l-en{ color:var(--accent-src); }
+    .masthead .langs .l-zh{ color:var(--accent-t1); }
+    .masthead .langs .l-ja{ color:var(--accent-t2); }
+    .masthead .langs .sep{
+      color:var(--faint);
+      padding:0 7px;
+      font-weight:400;
+    }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .icon{
+      font-family:var(--font-body);
+      font-size:11px;
+      font-weight:500;
+      letter-spacing:0.01em;
+      border:1px solid transparent;
+      background:transparent;
+      color:var(--muted);
+      border-radius:var(--radius);
+      padding:6px 8px;
+      line-height:1;
+      cursor:pointer;
+      transition:color 140ms ease,background 140ms ease,border-color 140ms ease,transform 100ms ease;
+      white-space:nowrap;
+    }
+    .icon:hover{
+      color:var(--text);
+      background:var(--rule-soft);
+      border-color:var(--rule-soft);
+    }
+    .icon:active{ transform:translateY(1px); }
+    .icon:disabled{
+      opacity:0.32;
+      cursor:not-allowed;
+      pointer-events:none;
+    }
+    .icon.primary{
+      color:var(--text);
+      background:var(--rule-soft);
+      border-color:var(--rule);
+    }
+    .icon.primary:hover{
+      background:var(--rule);
+      border-color:var(--rule-strong);
+    }
+
+    .icon.copied{
+      color:var(--success) !important;
+      background:var(--successBg) !important;
+      border-color:var(--success) !important;
+    }
+
+    /* Window-style red close button (for panel hide) */
+    .icon.icon-close{
+      color:var(--danger);
+      font-size:13px;
+      font-weight:600;
+      padding:6px 9px;
+      line-height:1;
+    }
+    .icon.icon-close:hover{
+      color:#fff;
+      background:var(--danger);
+      border-color:var(--danger);
+    }
+    .icon.refining{ animation:spin-refine 0.9s linear infinite; }
+    @keyframes spin-refine{ to{ transform:rotate(360deg); } }
+
+    /* Source language override dropdown
+       Hidden from the primary workspace: auto-detect is the default path now.
+       The element remains in the DOM so older wiring and stored preferences
+       do not create null-reference churn. */
+    .lang-select{
+      display:none;
+      font-family:var(--font-mono);
+      background:transparent;
+      border:1px solid var(--rule);
+      border-radius:var(--radius);
+      color:var(--muted);
+      font-size:10.5px;
+      font-weight:600;
+      letter-spacing:0.20em;
+      text-transform:uppercase;
+      padding:6px 10px;
+      cursor:pointer;
+      outline:none;
+      transition:color 140ms ease,border-color 140ms ease,background 140ms ease;
+    }
+    .lang-select:hover,.lang-select:focus{
+      color:var(--text);
+      border-color:var(--rule-strong);
+      background:var(--rule-soft);
+    }
+
+    /* ============================================================
+       PANEL — quiet containers + subtle accent stripe
+       ============================================================ */
+    .grid{
+      display:flex;
+      flex-direction:column;
+      gap:0;
+      flex:1;
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .panel{
+      position:relative;
+      border:1px solid var(--rule-soft);
+      background:var(--panel);
+      border-radius:var(--radius);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.025) inset,
+        0 10px 30px rgba(0,0,0,0.12);
+      transition:border-color 220ms ease,box-shadow 220ms ease;
+    }
+    [data-theme="light"] .panel{
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.50) inset,
+        0 8px 20px rgba(60,40,15,0.06);
+    }
+
+    /* Left accent stripe — primary visual identifier, kept deliberately quiet. */
+    .panel::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:3px;
+      background:var(--panel-accent, var(--rule));
+      opacity:0.68;
+      z-index:3;
+      transition:box-shadow 200ms ease,opacity 200ms ease;
+    }
+
+    .panel::after{
+      display:none;
+    }
+
+    /* Per-panel accent assignment */
+    #srcPanel{ --panel-accent:var(--accent-src); --panel-tint:var(--accent-src-bg); --panel-line:var(--accent-src-line); --panel-glow:var(--accent-src-glow); }
+    #t1Panel { --panel-accent:var(--accent-t1);  --panel-tint:var(--accent-t1-bg);  --panel-line:var(--accent-t1-line);  --panel-glow:var(--accent-t1-glow);  }
+    #t2Panel { --panel-accent:var(--accent-t2);  --panel-tint:var(--accent-t2-bg);  --panel-line:var(--accent-t2-line);  --panel-glow:var(--accent-t2-glow);  }
+    #srcPanel{ flex:1 1 0; }
+    .outs{ flex:2 1 0; }
+
+    .panel:hover{
+      border-color:var(--rule);
+    }
+    .panel:focus-within{
+      border-color:var(--panel-line);
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.035) inset,
+        0 10px 32px rgba(0,0,0,0.16);
+    }
+    .panel:hover::before,
+    .panel:focus-within::before{ opacity:0.95; }
+
+    /* ============================================================
+       PANEL HEADER (.bar)
+       ============================================================ */
+    .bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:8px 12px 8px 16px;
+      border-bottom:1px solid var(--rule-hair);
+      background:linear-gradient(180deg,
+        var(--panel-tint, transparent) 0%,
+        transparent 82%);
+      flex-shrink:0;
+      flex-wrap:wrap;
+    }
+
+    .panel-id{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .panel-mark{
+      display:none;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:0;
+      padding:0;
+      background:transparent;
+      border:none;
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-weight:600;
+      letter-spacing:0;
+    }
+    .chip .role{
+      color:var(--muted);
+      font-size:10.5px;
+      letter-spacing:0.08em;
+      text-transform:uppercase;
+      padding-right:6px;
+    }
+    .chip .sep{
+      display:inline-block;
+      width:1px;
+      height:10px;
+      background:var(--rule);
+      margin:0 6px 0 0;
+      transform:translateY(1px);
+    }
+    .chip .lang{
+      color:var(--panel-accent);
+      font-size:11.5px;
+      letter-spacing:0.04em;
+      font-weight:700;
+    }
+
+    .count{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.10em;
+      color:var(--faint);
+      font-variant-numeric:tabular-nums;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:3px;
+      flex-wrap:wrap;
+    }
+
+    /* ============================================================
+       TEXTAREA / OUTPUT
+       ============================================================ */
+    textarea{
+      width:100%;
+      border:0;
+      background:transparent;
+      color:var(--text);
+      padding:14px 22px 18px 22px;
+      resize:none;
+      outline:none;
+      font-family:var(--font-serif);
+      font-size:23px;
+      line-height:1.65;
+      letter-spacing:0.005em;
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      font-feature-settings:'kern','liga';
+    }
+
+    textarea::placeholder{
+      color:var(--faint);
+      opacity:0.55;
+      font-style:italic;
+      font-family:var(--font-display);
+      font-variation-settings:'opsz' 96,'SOFT' 80;
+    }
+
+    .output-text{
+      margin:0;
+      width:100%;
+      border:0;
+      background:transparent;
+      color:var(--text);
+      padding:14px 22px 18px 22px;
+      font-family:var(--font-serif);
+      font-size:23px;
+      line-height:1.65;
+      letter-spacing:0.005em;
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      white-space:pre-wrap;
+      word-break:break-word;
+      outline:none;
+      cursor:text;
+      font-feature-settings:'kern','liga';
+    }
+    .output-text:focus{
+      box-shadow:inset 0 0 0 1.5px var(--panel-accent);
+      border-radius:3px;
+    }
+    .output-text:empty::before{
+      content:attr(data-placeholder);
+      color:var(--faint);
+      opacity:0.65;
+      font-style:italic;
+      font-family:var(--font-display);
+      font-variation-settings:'opsz' 96,'SOFT' 100;
+      pointer-events:none;
+    }
+
+    #out1{ color:var(--t1Color); }
+    #out2{ color:var(--t2Color); }
+
+    /* ============================================================
+       DIVIDERS — visible grip + hover indicator
+       ============================================================ */
+    .h-divider{
+      height:var(--dividerW);
+      cursor:row-resize;
+      position:relative;
+      flex-shrink:0;
+      touch-action:none;
+    }
+    .h-divider::before{
+      content:"";
+      position:absolute;
+      left:20%;
+      right:20%;
+      top:50%;
+      height:1px;
+      transform:translateY(-50%);
+      background:
+        linear-gradient(90deg,transparent,var(--rule-soft) 30%,var(--rule-soft) 70%,transparent);
+      opacity:0.45;
+      transition:opacity 160ms ease,height 160ms ease;
+    }
+    .h-divider::after{ display:none; }
+    .h-divider:hover::before{ opacity:0.75; height:2px; }
+
+    .outs{
+      display:grid;
+      grid-template-columns: calc(var(--split) * (100% - var(--dividerW))) var(--dividerW) calc((1 - var(--split)) * (100% - var(--dividerW)));
+      gap:0;
+      align-items:stretch;
+      flex:1;
+      min-height:0;
+    }
+
+    .divider{
+      width:var(--dividerW);
+      cursor:col-resize;
+      position:relative;
+      touch-action:none;
+    }
+    .divider::before{
+      content:"";
+      position:absolute;
+      top:20%;
+      bottom:20%;
+      left:50%;
+      width:1px;
+      transform:translateX(-50%);
+      background:
+        linear-gradient(180deg,transparent,var(--rule-soft) 30%,var(--rule-soft) 70%,transparent);
+      opacity:0.45;
+      transition:opacity 160ms ease,width 160ms ease;
+    }
+    .divider::after{ display:none; }
+    .divider:hover::before{ opacity:0.75; width:2px; }
+
+    .outs.hide-t1 #t1Panel{display:none}
+    .outs.hide-t2 #t2Panel{display:none}
+    .outs.hide-t1 .divider,
+    .outs.hide-t2 .divider{display:none}
+    .outs.hide-t1{grid-template-columns:1fr}
+    .outs.hide-t2{grid-template-columns:1fr}
+
+    /* ============================================================
+       RESTORE BARS
+       ============================================================ */
+    .restore-row{
+      display:flex;
+      gap:10px;
+      flex-shrink:0;
+    }
+    .restore-row:empty,.restore-row:not(:has(.show)){display:none}
+
+    .restore-bar{
+      display:none;
+      align-items:center;
+      gap:14px;
+      padding:10px 18px;
+      border-radius:var(--radius);
+      background:var(--panel);
+      border:1.5px dashed var(--rule);
+      justify-content:center;
+      flex:1;
+      position:relative;
+    }
+    .restore-bar.show{display:flex}
+    #restore1{ border-color:var(--accent-t1-line); }
+    #restore2{ border-color:var(--accent-t2-line); }
+    #restore1 .chip .lang{ color:var(--accent-t1); }
+    #restore2 .chip .lang{ color:var(--accent-t2); }
+    .restore-row{ margin-bottom:8px; }
+
+    /* ============================================================
+       PANEL BODY (for reverse translation side-by-side)
+       ============================================================ */
+    .panel-body{
+      display:flex;
+      min-height:0;
+      flex:1;
+    }
+    .panel-body>.output-text{
+      flex:1;
+      min-width:0;
+    }
+
+    .reverse-col{
+      flex:1;
+      min-width:0;
+      border-left:1.5px solid var(--reverseBd);
+      background:var(--reverseBg);
+      display:flex;
+      flex-direction:column;
+    }
+    .reverse-header{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px 7px;
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      border-bottom:1px solid var(--reverseBd);
+      background:linear-gradient(180deg,rgba(168,85,247,0.06),transparent);
+    }
+    .reverse-header .chip{
+      font-size:10px;
+      letter-spacing:0.14em;
+    }
+    .reverse-text{
+      color:var(--reverseText) !important;
+      flex:1;
+    }
+
+    /* ============================================================
+       SETTINGS OVERLAY / MODAL
+       ============================================================ */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:flex-start;
+      justify-content:center;
+      padding:60px 20px 20px;
+      background:rgba(0,0,0,0.62);
+      backdrop-filter:blur(14px) saturate(140%);
+      -webkit-backdrop-filter:blur(14px) saturate(140%);
+      z-index:50;
+    }
+    .overlay.show{ display:flex; }
+    [data-theme="light"] .overlay{ background:rgba(40,30,20,0.40); }
+
+    .modal{
+      width:min(560px,100%);
+      border-radius:var(--radius);
+      background:var(--toastBg);
+      border:1.5px solid var(--rule-strong);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.55),
+        0 1px 0 rgba(255,255,255,0.05) inset;
+      padding:22px 24px 18px;
+      animation:modal-in 280ms cubic-bezier(0.2,0.8,0.2,1);
+      position:relative;
+    }
+    .modal::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:4px;
+      background:var(--accent-src);
+      border-radius:var(--radius) 0 0 var(--radius);
+    }
+    @keyframes modal-in{
+      from{ opacity:0; transform:translateY(-12px) scale(0.99); }
+      to{ opacity:1; transform:translateY(0) scale(1); }
+    }
+
+    .modalHead{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      padding:0 0 14px 0;
+      margin-bottom:4px;
+      border-bottom:1px solid var(--rule-soft);
+    }
+    .modalHead .modal-title{
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:22px;
+      letter-spacing:-0.01em;
+      color:var(--text);
+      font-variation-settings:'opsz' 144,'SOFT' 50;
+      font-style:italic;
+      line-height:1;
+    }
+    .modalHead .modal-tag{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.30em;
+      text-transform:uppercase;
+      color:var(--faint);
+    }
+
+    .field{
+      display:grid;
+      gap:8px;
+      margin-top:14px;
+      padding:12px 12px 10px;
+      border-radius:var(--radius);
+      border:1px solid var(--rule-soft);
+      background:var(--panel-2);
+    }
+    .field label{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.20em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:600;
+    }
+
+    .in,.modal select{
+      width:100%;
+      border-radius:var(--radius);
+      border:1px solid var(--rule);
+      background:var(--bg);
+      color:var(--text);
+      padding:10px 12px;
+      outline:none;
+      font-size:13px;
+      font-family:var(--font-body);
+      transition:border-color 140ms ease,box-shadow 140ms ease;
+    }
+    .in:focus,.modal select:focus{
+      border-color:var(--accent-src);
+      box-shadow:0 0 0 3px var(--accent-src-bg);
+    }
+
+    .tog{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:4px 0;
+    }
+    .tog span{
+      font-size:13px;
+      color:var(--text);
+      font-weight:500;
+    }
+    .tog input[type="checkbox"]{
+      accent-color:var(--accent-src);
+      width:16px;
+      height:16px;
+      cursor:pointer;
+    }
+
+    .hint{
+      font-family:var(--font-mono);
+      font-size:10px;
+      color:var(--faint);
+      letter-spacing:0.04em;
+      padding:4px 0 0;
+      line-height:1.55;
+    }
+
+    /* ============================================================
+       TTS — speaking states
+       ============================================================ */
+    .icon.speaking{
+      color:var(--danger) !important;
+      background:var(--dangerBg) !important;
+      border-color:var(--dangerBd) !important;
+    }
+
+    .panel.speaking-glow::before{
+      box-shadow:
+        0 0 12px var(--panel-accent),
+        0 0 30px var(--panel-glow);
+      animation:stripe-pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes stripe-pulse{
+      0%,100%{ opacity:1; }
+      50%{ opacity:0.55; }
+    }
+
+    .stop-fab{
+      position:fixed;
+      bottom:24px;
+      right:24px;
+      background:var(--danger);
+      color:#fff;
+      border:none;
+      border-radius:var(--radius);
+      padding:12px 22px;
+      font-weight:600;
+      font-size:12.5px;
+      font-family:var(--font-body);
+      letter-spacing:0.04em;
+      cursor:pointer;
+      box-shadow:
+        0 8px 28px rgba(248,113,113,0.45),
+        0 1px 0 rgba(255,255,255,0.10) inset;
+      transform:scale(0);
+      transition:transform 220ms cubic-bezier(0.2,0.8,0.2,1);
+      z-index:150;
+    }
+    .stop-fab.show{ transform:scale(1); }
+    .stop-fab:hover{ filter:brightness(1.08); }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    #toastHost{
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      z-index:9999;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+      pointer-events:none;
+      max-width:400px;
+    }
+    .toast-item{
+      background:var(--toastBg);
+      color:var(--text);
+      border:1.5px solid var(--rule);
+      border-radius:var(--radius);
+      padding:10px 16px;
+      font-size:12.5px;
+      font-family:var(--font-body);
+      line-height:1.5;
+      white-space:pre-line;
+      box-shadow:0 12px 30px rgba(0,0,0,0.40);
+      opacity:0;
+      transform:translateY(8px);
+      transition:opacity 160ms ease,transform 160ms ease;
+      pointer-events:auto;
+      cursor:pointer;
+      backdrop-filter:blur(8px);
+    }
+    .toast-item.show{ opacity:1; transform:translateY(0); }
+    .toast-item.out{ opacity:0; transform:translateY(8px); transition-duration:200ms; }
+    .toast-item.toast-error{
+      border-color:var(--dangerBd);
+      background:var(--dangerBg);
+      color:var(--danger);
+    }
+    .toast-item.toast-undo{
+      border-color:var(--blueBd);
+      background:var(--blueBg);
+    }
+    .toast-item .undo-link{
+      color:var(--blue);
+      font-weight:600;
+      text-decoration:underline;
+      cursor:pointer;
+      margin-left:6px;
+    }
+
+    /* ============================================================
+       SKELETON LOADING
+       ============================================================ */
+    @keyframes skeleton-pulse{
+      0%,100%{ opacity:0.32; }
+      50%{ opacity:0.7; }
+    }
+    .panel.loading .output-text::before{
+      content:"";
+      display:block;
+      height:100%;
+      background:
+        linear-gradient(var(--skelBar) 16px,transparent 16px) 0 0  / 85% 32px,
+        linear-gradient(var(--skelBar) 16px,transparent 16px) 0 32px / 70% 32px,
+        linear-gradient(var(--skelBar) 16px,transparent 16px) 0 64px / 90% 32px,
+        linear-gradient(var(--skelBar) 16px,transparent 16px) 0 96px / 60% 32px;
+      background-repeat:no-repeat;
+      animation:skeleton-pulse 1.5s ease-in-out infinite;
+      border-radius:2px;
+      font-style:normal;
+      opacity:1;
+    }
+
+    /* Loading panel: stripe pulses with accent color */
+    .panel.loading::before{
+      animation:stripe-load 1.4s ease-in-out infinite;
+    }
+    @keyframes stripe-load{
+      0%,100%{ opacity:1; box-shadow:0 0 8px var(--panel-glow); }
+      50%{ opacity:0.5; box-shadow:0 0 22px var(--panel-glow); }
+    }
+
+    /* ============================================================
+       DIFF
+       ============================================================ */
+    .diff-add{
+      background:var(--diffAdd);
+      border-radius:2px;
+      padding:1px 2px;
+      font-weight:500;
+    }
+    .diff-del{
+      background:var(--diffDel);
+      text-decoration:line-through;
+      color:var(--diffDelText);
+      border-radius:2px;
+      padding:1px 2px;
+    }
+    .icon.diff-active{
+      color:var(--blue) !important;
+      background:var(--blueBg) !important;
+      border-color:var(--blue) !important;
+    }
+
+    /* ============================================================
+       ACCESSIBILITY / RESPONSIVE
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce){
+      .toast-item,.toast-item.show,.toast-item.out{ transform:none; }
+      .panel.loading .output-text::before{ animation:none; opacity:0.5; }
+      .icon.refining{ animation:none; }
+      .panel.loading::before{ animation:none; opacity:0.6; }
+      .panel.speaking-glow::before{ animation:none; }
+      *{ transition-duration:0.01ms !important; animation-duration:0.01ms !important; }
+    }
+
+    @media (max-width: 980px){
+      .wrap{ padding:14px 16px 12px; }
+      .toprow{ flex-wrap:wrap; gap:8px; }
+      .masthead .subtitle{ display:none; }
+      .masthead .wordmark{ font-size:22px; }
+    }
+
+    @media (max-width: 720px){
+      .outs{ grid-template-columns:1fr; }
+      .divider{ display:none; }
+      textarea,.output-text{ font-size:19px; padding:12px 16px 14px 16px; }
+      .bar{ padding:10px 12px 9px 14px; }
+      .panel::before{ width:3px; }
+      #toastHost{
+        right:50%;
+        transform:translateX(50%);
+        align-items:center;
+        max-width:92vw;
+      }
+      .panel-body{ flex-direction:column; }
+      .reverse-col{
+        border-left:none;
+        border-top:1.5px solid var(--reverseBd);
+      }
+    }
+
+    /* ============================================================
+       v2: GLOSSARY MODAL — wide modal with table + actions
+       ============================================================ */
+    .modal-wide{
+      width:min(720px,100%);
+    }
+    .glossary-actions{
+      display:flex;
+      gap:6px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    .glossary-add-row{
+      display:grid;
+      grid-template-columns:1fr auto 1fr auto;
+      gap:8px;
+      align-items:center;
+      margin-top:14px;
+      padding:10px 12px;
+      border-radius:var(--radius);
+      border:1px solid var(--rule-soft);
+      background:var(--panel-2);
+    }
+    .glossary-arrow{
+      color:var(--faint);
+      font-family:var(--font-mono);
+      text-align:center;
+      font-size:14px;
+    }
+    .glossary-suggestions{
+      margin-top:14px;
+      padding:10px 12px;
+      border-radius:var(--radius);
+      border:1px solid var(--accent-src-line);
+      background:var(--accent-src-bg);
+      max-height:240px;
+      overflow-y:auto;
+    }
+    .glossary-section-label{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.20em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:600;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .suggestion-item{
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:8px;
+      align-items:center;
+      padding:6px 0;
+      border-bottom:1px solid var(--rule-soft);
+    }
+    .suggestion-item:last-child{ border-bottom:none; }
+    .suggestion-text{
+      font-size:13px;
+      color:var(--text);
+      font-family:var(--font-serif);
+      word-break:break-word;
+    }
+    .glossary-table-wrap{
+      margin-top:14px;
+      max-height:340px;
+      overflow-y:auto;
+      border:1px solid var(--rule-soft);
+      border-radius:var(--radius);
+    }
+    .glossary-table{
+      width:100%;
+      border-collapse:collapse;
+    }
+    .glossary-table th,.glossary-table td{
+      padding:8px 12px;
+      text-align:left;
+      border-bottom:1px solid var(--rule-soft);
+      font-size:13px;
+      color:var(--text);
+    }
+    .glossary-table th{
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:600;
+      background:var(--panel-2);
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    .glossary-table tr:last-child td{ border-bottom:none; }
+    .glossary-table td.glossary-action{
+      text-align:right;
+      width:60px;
+    }
+    .glossary-table td.glossary-action button{
+      padding:4px 8px;
+      font-size:11px;
+    }
+    .glossary-empty{
+      text-align:center;
+      padding:28px 12px;
+      color:var(--faint);
+      font-style:italic;
+      font-family:var(--font-display);
+    }
+    .glossary-cell{
+      font-family:var(--font-serif);
+      word-break:break-word;
+    }
+
+    /* ============================================================
+       v2: TONE SELECT — target toolbar
+       ============================================================ */
+    .tone-select{
+      min-width:92px;
+      max-width:116px;
+      padding:5px 22px 5px 8px;
+      border:1px solid var(--rule-soft);
+      border-radius:var(--radius);
+      background:var(--panel-2);
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:11px;
+      line-height:1;
+      cursor:pointer;
+      outline:none;
+      transition:color 140ms ease,border-color 140ms ease,background 140ms ease;
+    }
+    .tone-select:hover,
+    .tone-select:focus{
+      color:var(--text);
+      border-color:var(--panel-line);
+      background:var(--elev);
+    }
+    .tone-select option{
+      background:var(--panel);
+      color:var(--text);
+    }
+
+    /* ============================================================
+       v2: PRE-EDIT DROPDOWN
+       ============================================================ */
+    .preedit-wrap{
+      position:relative;
+      display:inline-flex;
+    }
+    .preedit-dropdown{
+      position:fixed;
+      z-index:60;
+      min-width:240px;
+      background:var(--toastBg);
+      border:1.5px solid var(--rule-strong);
+      border-radius:var(--radius);
+      padding:6px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.45);
+      display:none;
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+    .preedit-dropdown.show{ display:block; }
+    .preedit-section{
+      padding:8px 10px 4px;
+      font-family:var(--font-mono);
+      font-size:9px;
+      letter-spacing:0.20em;
+      text-transform:uppercase;
+      color:var(--faint);
+      font-weight:600;
+    }
+    .preedit-section:not(:first-child){
+      margin-top:4px;
+      border-top:1px solid var(--rule-soft);
+    }
+    .preedit-item{
+      display:flex;
+      align-items:center;
+      gap:0;
+      padding:8px 10px;
+      border-radius:4px;
+      cursor:pointer;
+      font-size:12.5px;
+      color:var(--text);
+      user-select:none;
+      transition:background 140ms ease;
+    }
+    .preedit-item:hover{ background:var(--rule-soft); }
+    .preedit-item-icon{
+      display:none;
+    }
+    .preedit-item-label{ flex:1; }
+    .preedit-item-desc{
+      font-size:10px;
+      color:var(--faint);
+      font-family:var(--font-mono);
+      letter-spacing:0.04em;
+    }
+
+    /* preedit busy pulse on src panel */
+    #srcPanel.preediting::before{
+      animation:stripe-load 1.4s ease-in-out infinite;
+    }
+    #srcPanel.preediting textarea{
+      opacity:0.55;
+      pointer-events:none;
+    }
+
+    /* file import / glossary buttons in src panel — keep visual rhythm */
+    .actions .preedit-wrap .icon{ white-space:nowrap; }
+
+    /* ============================================================
+       v2 PHASE 3: CHAT SIDEBAR
+       ============================================================ */
+    .chat-sidebar{
+      position:fixed;
+      top:0; right:0; bottom:0;
+      width:var(--chatW);
+      max-width:100vw;
+      background:var(--panel);
+      border-left:1.5px solid var(--rule-strong);
+      box-shadow:-30px 0 60px rgba(0,0,0,0.45);
+      transform:translateX(100%);
+      transition:transform 280ms cubic-bezier(0.2,0.8,0.2,1);
+      z-index:80;
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+    }
+    .chat-sidebar.show{ transform:translateX(0); }
+    .chat-sidebar.show{
+      box-shadow:-10px 0 24px rgba(0,0,0,0.18);
+    }
+
+    .chat-sidebar::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:4px;
+      background:var(--accent-t1);
+      z-index:1;
+    }
+
+    .chat-header{
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      padding:14px 18px 12px 22px;
+      border-bottom:1.5px solid var(--rule);
+      background:linear-gradient(180deg,var(--accent-t1-bg),transparent);
+    }
+    .chat-header .chat-title{
+      font-family:var(--font-display);
+      font-weight:600;
+      font-size:18px;
+      letter-spacing:-0.01em;
+      color:var(--text);
+      font-style:italic;
+      font-variation-settings:'opsz' 144,'SOFT' 50;
+    }
+    .chat-header .chat-tag{
+      font-family:var(--font-mono);
+      font-size:9px;
+      letter-spacing:0.26em;
+      text-transform:uppercase;
+      color:var(--faint);
+    }
+    .chat-header-actions{
+      display:flex;
+      gap:2px;
+    }
+    .chat-header-actions #btnCloseChat.icon-close{ color:var(--danger); }
+    .chat-header-actions #btnCloseChat.icon-close:hover{
+      color:#fff;
+      background:var(--danger);
+      border-color:var(--danger);
+    }
+
+    .chat-list{
+      flex:1;
+      min-height:0;
+      overflow-y:auto;
+      padding:14px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .chat-list:empty::before{
+      content:"開始對話 — 詢問用語、確認語意、討論翻譯";
+      display:block;
+      color:var(--faint);
+      font-style:italic;
+      font-family:var(--font-display);
+      font-size:14px;
+      text-align:center;
+      padding:30px 14px;
+      line-height:1.6;
+    }
+
+    .chat-msg{
+      max-width:90%;
+      padding:9px 14px;
+      border-radius:var(--radius);
+      font-size:13.5px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family:var(--font-body);
+    }
+    .chat-msg.user{
+      align-self:flex-end;
+      background:var(--accent-t1-bg);
+      border:1px solid var(--accent-t1-line);
+      color:var(--text);
+    }
+    .chat-msg.assistant{
+      align-self:flex-start;
+      background:var(--panel-2);
+      border:1px solid var(--rule-soft);
+      color:var(--text);
+    }
+    .chat-msg.assistant.streaming::after{
+      content:"▌";
+      display:inline-block;
+      color:var(--accent-t1);
+      animation:caret-blink 1s steps(2) infinite;
+      margin-left:1px;
+    }
+    @keyframes caret-blink{
+      0%,100%{ opacity:1; }
+      50%{ opacity:0; }
+    }
+
+    /* Markdown rendering inside assistant chat messages */
+    .chat-msg.assistant{ white-space:normal; }
+    .chat-msg.assistant > *:first-child{ margin-top:0; }
+    .chat-msg.assistant > *:last-child{ margin-bottom:0; }
+    .chat-msg.assistant p{
+      margin:6px 0;
+      white-space:pre-wrap;
+    }
+    .chat-msg.assistant h1,
+    .chat-msg.assistant h2,
+    .chat-msg.assistant h3{
+      font-family:var(--font-display);
+      font-weight:600;
+      font-style:italic;
+      font-variation-settings:'opsz' 144,'SOFT' 50;
+      letter-spacing:-0.01em;
+      color:var(--text);
+      margin:12px 0 6px;
+      line-height:1.3;
+    }
+    .chat-msg.assistant h1{ font-size:18px; }
+    .chat-msg.assistant h2{ font-size:16px; }
+    .chat-msg.assistant h3{ font-size:14px; }
+    .chat-msg.assistant ul,
+    .chat-msg.assistant ol{
+      margin:6px 0;
+      padding-left:22px;
+    }
+    .chat-msg.assistant li{ margin:2px 0; }
+    .chat-msg.assistant blockquote{
+      margin:8px 0;
+      padding:6px 12px;
+      border-left:2px solid var(--accent-t1);
+      background:var(--accent-t1-bg);
+      color:var(--muted);
+      border-radius:2px;
+    }
+    .chat-msg.assistant code{
+      font-family:var(--font-mono);
+      font-size:12px;
+      padding:1px 5px;
+      background:var(--bg);
+      border:1px solid var(--rule-soft);
+      border-radius:3px;
+      color:var(--accent-src);
+    }
+    .chat-msg.assistant pre{
+      margin:8px -2px;
+      padding:12px 12px 10px;
+      background:var(--bg-2);
+      border:1px solid var(--rule);
+      border-radius:var(--radius);
+      overflow-x:auto;
+      position:relative;
+      font-family:var(--font-mono);
+    }
+    .chat-msg.assistant pre code{
+      font-family:var(--font-mono);
+      font-size:12px;
+      background:none;
+      border:none;
+      padding:0;
+      color:var(--text);
+      white-space:pre;
+      display:block;
+    }
+    .chat-msg.assistant pre[data-lang]::before{
+      content:attr(data-lang);
+      position:absolute;
+      top:4px;
+      right:8px;
+      font-family:var(--font-mono);
+      font-size:9px;
+      letter-spacing:0.16em;
+      text-transform:uppercase;
+      color:var(--faint);
+      pointer-events:none;
+    }
+    .chat-msg.assistant strong{ font-weight:600; color:var(--text); }
+    .chat-msg.assistant em{ font-style:italic; }
+    .chat-msg.assistant a{
+      color:var(--accent-t1);
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
+    .chat-msg.assistant a:hover{ filter:brightness(1.15); }
+    .chat-msg.assistant hr{
+      border:0;
+      height:1px;
+      background:var(--rule-soft);
+      margin:10px 0;
+    }
+
+    .chat-input-row{
+      flex-shrink:0;
+      display:flex;
+      align-items:flex-end;
+      gap:6px;
+      padding:10px 14px 14px;
+      border-top:1px solid var(--rule-soft);
+      background:var(--panel-2);
+    }
+    .chat-input-row textarea{
+      flex:1;
+      min-height:38px;
+      max-height:140px;
+      padding:10px 12px;
+      border:1px solid var(--rule);
+      border-radius:var(--radius);
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--font-body);
+      font-size:13.5px;
+      line-height:1.5;
+      outline:none;
+      resize:none;
+      transition:border-color 140ms ease,box-shadow 140ms ease;
+    }
+    .chat-input-row textarea:focus{
+      border-color:var(--accent-t1);
+      box-shadow:0 0 0 3px var(--accent-t1-bg);
+    }
+    .chat-input-row .icon{ flex-shrink:0; }
+
+    /* When chat is open, dim the rest of the page */
+    .chat-scrim{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.30);
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+      z-index:75;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 240ms ease;
+    }
+    .chat-scrim.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+    [data-theme="light"] .chat-scrim{ background:rgba(40,30,20,0.18); }
+
+    /* ============================================================
+       v2 PHASE 3: SELECTION TOOLTIP (Ask AI)
+       ============================================================ */
+    .selection-tooltip{
+      position:fixed;
+      z-index:65;
+      transform:translate(-50%,-100%) translateY(-8px);
+      display:none;
+      pointer-events:auto;
+    }
+    .selection-tooltip.show{ display:block; }
+    .selection-tooltip button{
+      background:var(--accent-t1);
+      color:#0a0e14;
+      border:1px solid var(--accent-t1);
+      border-radius:var(--radius);
+      padding:6px 12px;
+      font-size:11.5px;
+      font-weight:600;
+      letter-spacing:0.04em;
+      cursor:pointer;
+      box-shadow:0 6px 20px rgba(0,0,0,0.40),0 0 12px var(--accent-t1-glow);
+      font-family:var(--font-body);
+      white-space:nowrap;
+      transition:filter 140ms ease,transform 100ms ease;
+    }
+    .selection-tooltip button:hover{ filter:brightness(1.08); }
+    .selection-tooltip button:active{ transform:translateY(1px); }
+    [data-theme="light"] .selection-tooltip button{ color:#fffdf6; }
+
+    /* Mobile: chat takes full width */
+    @media (max-width:720px){
+      .chat-sidebar{ width:100vw; }
+      body.chat-open .wrap{
+        width:100vw;
+        padding-right:16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- v2: Glossary modal -->
+  <div class="overlay" id="glossaryOverlay" aria-hidden="true">
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Glossary">
+      <div class="modalHead">
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span class="modal-title">Glossary</span>
+          <span class="modal-tag">字彙表 · Cabinet</span>
+        </div>
+        <button class="icon" id="btnCloseGlossary" aria-label="Close glossary" title="Close">✕</button>
+      </div>
+
+      <div class="glossary-actions">
+        <button class="icon" id="btnExtractGlossary" title="使用 AI 從目前原文抽取重複的專有名詞與術語">從原文抽取</button>
+        <button class="icon" id="btnImportGlossary" title="匯入 CSV 檔（兩欄：原文,譯文）">匯入 CSV</button>
+        <button class="icon" id="btnExportGlossary" title="匯出目前字彙為 CSV">匯出 CSV</button>
+        <button class="icon" id="btnClearGlossary" title="清空整本字彙表">清空</button>
+        <input type="file" id="glossaryFileInput" style="display:none" accept=".csv,.txt">
+      </div>
+
+      <div class="glossary-suggestions" id="glossarySuggestions" style="display:none">
+        <div class="glossary-section-label">
+          <span>AI 建議（一鍵採用）</span>
+          <button class="icon" id="btnDismissSuggestions" title="忽略全部建議">✕</button>
+        </div>
+        <div id="suggestionList"></div>
+      </div>
+
+      <div class="glossary-add-row">
+        <input class="in" id="glossaryNewSource" placeholder="原文 (source term)">
+        <span class="glossary-arrow" aria-hidden="true">↔</span>
+        <input class="in" id="glossaryNewTrans" placeholder="譯文 (translation)">
+        <button class="icon primary" id="btnAddGlossary" title="新增詞彙">新增</button>
+      </div>
+
+      <div class="glossary-table-wrap">
+        <table class="glossary-table">
+          <thead>
+            <tr>
+              <th>原文 / Source</th>
+              <th>譯文 / Translation</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="glossaryTbody"></tbody>
+        </table>
+        <div class="glossary-empty" id="glossaryEmpty">尚無字彙 — 從原文抽取或手動新增</div>
+      </div>
+
+      <div class="hint" style="padding:10px 0 0;">字彙會自動注入翻譯與潤稿 prompt，雙向對應（不限譯入或譯出方向）。</div>
+    </div>
+  </div>
+
+  <div class="overlay" id="settingsOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Settings">
+      <div class="modalHead">
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span class="modal-title">Settings</span>
+          <span class="modal-tag">Cabinet · 設定</span>
+        </div>
+        <button class="icon" id="btnCloseSettings" aria-label="Close settings" title="Close">✕</button>
+      </div>
+
+      <div class="field">
+        <label for="apiKey">API Key</label>
+        <input class="in" id="apiKey" type="password" placeholder="sk-…" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="ttsKey">Google Cloud TTS API Key（選填，高品質語音）</label>
+        <input class="in" id="ttsKey" type="password" placeholder="AIzaSy…" autocomplete="off">
+        <div class="hint">提供金鑰可使用 Wavenet / Neural2 高品質語音；未填則使用瀏覽器內建 Google 語音（免費）</div>
+      </div>
+
+      <div class="field">
+        <label for="model">Model</label>
+        <select id="model"><option value="gpt-5.3-instant">gpt-5.3-instant</option><option value="gpt-5.4">gpt-5.4</option><option value="gpt-5.2">gpt-5.2</option><option value="gpt-5.1">gpt-5.1</option><option value="gpt-4o">gpt-4o</option></select>
+      </div>
+
+      <div class="field">
+        <div class="tog">
+          <span>Auto translate</span>
+          <input id="auto" type="checkbox">
+        </div>
+        <div class="tog">
+          <span>Auto refine</span>
+          <input id="autoRefine" type="checkbox">
+        </div>
+        <div class="hint">Shortcuts: Ctrl/Cmd+Enter translate · Esc cancel</div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px;">
+        <button class="icon primary" id="btnDone" title="Done">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="toprow">
+      <div class="masthead">
+        <span class="wordmark">三語書房</span>
+        <span class="subtitle">Trilingual&nbsp;Cabinet · v2</span>
+        <span class="langs"><span class="l-en">EN</span><span class="sep">·</span><span class="l-zh">中</span><span class="sep">·</span><span class="l-ja">日</span></span>
+      </div>
+      <select class="lang-select" id="langOverride" aria-label="Source language override" title="Source language">
+        <option value="auto">Auto</option>
+        <option value="en">EN</option>
+        <option value="zh-TW">ZH-TW</option>
+        <option value="ja">JA</option>
+      </select>
+      <button class="icon" id="btnGlossary" aria-label="Open glossary" title="字彙表 (Glossary)">字彙</button>
+      <button class="icon" id="btnChat" aria-label="Open AI assistant" title="AI 助手 (Chat)">助手</button>
+      <button class="icon" id="btnTheme" aria-label="Toggle dark/light theme" title="Switch to light theme">主題</button>
+      <button class="icon" id="btnSettings" aria-label="Open settings" title="Settings">設定</button>
+    </div>
+
+    <div class="grid">
+      <section class="panel" id="srcPanel" data-role="src">
+        <div class="bar">
+          <div class="panel-id">
+            <span class="chip">
+              <span class="role">Source</span>
+              <span class="sep" aria-hidden="true"></span>
+              <span class="lang" id="srcLang">—</span>
+            </span>
+            <span class="count" id="srcCount">0</span>
+          </div>
+          <div class="actions">
+            <button class="icon" id="btnImport" aria-label="Import file" title="匯入檔案 (.txt / .md / .csv)">匯入</button>
+            <span class="preedit-wrap">
+              <button class="icon" id="btnPreedit" aria-label="Edit source text" title="原文編修">原文編修 ▾</button>
+              <div class="preedit-dropdown" id="preeditDropdown" role="menu">
+                <div class="preedit-section">修正類</div>
+                <div class="preedit-item" data-mode="format" role="menuitem">
+                  <span class="preedit-item-label">格式清理<div class="preedit-item-desc">修復斷行、空格</div></span>
+                </div>
+                <div class="preedit-item" data-mode="correct" role="menuitem">
+                  <span class="preedit-item-label">校正錯字<div class="preedit-item-desc">錯字、語法、標點</div></span>
+                </div>
+                <div class="preedit-section">改寫類</div>
+                <div class="preedit-item" data-mode="clarify" role="menuitem">
+                  <span class="preedit-item-label">釐清語意<div class="preedit-item-desc">模糊 → 清楚</div></span>
+                </div>
+                <div class="preedit-item" data-mode="business" role="menuitem">
+                  <span class="preedit-item-label">商務口氣<div class="preedit-item-desc">轉專業正式</div></span>
+                </div>
+                <div class="preedit-item" data-mode="plain" role="menuitem">
+                  <span class="preedit-item-label">白話易懂<div class="preedit-item-desc">轉平實口語</div></span>
+                </div>
+                <div class="preedit-item" data-mode="humorous" role="menuitem">
+                  <span class="preedit-item-label">幽默<div class="preedit-item-desc">加入詼諧筆觸</div></span>
+                </div>
+              </div>
+            </span>
+            <button class="icon" id="btnSpeakSrc" aria-label="Read aloud source text" title="朗讀原文">朗讀</button>
+            <button class="icon primary" id="btnTranslate" aria-label="Translate" title="Translate (Ctrl/Cmd+Enter)">翻譯</button>
+            <button class="icon" id="btnCopySrc" aria-label="Copy source text" title="Copy" disabled="">複製</button>
+            <button class="icon" id="btnClear" aria-label="Clear all" title="Clear" disabled="">清除</button>
+            <input type="file" id="fileInput" style="display:none" accept=".txt,.md,.csv">
+          </div>
+        </div>
+        <textarea id="src" placeholder="Input…"></textarea>
+      </section>
+
+      <div class="h-divider" id="hDivider" title="Drag to resize vertically"></div>
+
+      <div class="restore-row" id="restoreRow">
+        <div class="restore-bar" id="restore1">
+          <span class="chip">
+            <span class="role">T1</span>
+            <span class="sep" aria-hidden="true"></span>
+            <span class="lang" id="restore1Lang">ZH-TW</span>
+          </span>
+          <button class="icon primary" id="btnRestore1" aria-label="Restore translation 1" title="顯示譯文">顯示 T1</button>
+        </div>
+        <div class="restore-bar" id="restore2">
+          <span class="chip">
+            <span class="role">T2</span>
+            <span class="sep" aria-hidden="true"></span>
+            <span class="lang" id="restore2Lang">JA</span>
+          </span>
+          <button class="icon primary" id="btnRestore2" aria-label="Restore translation 2" title="顯示譯文">顯示 T2</button>
+        </div>
+      </div>
+
+      <div class="outs" id="outs" style="--split: 0.5;">
+        <section class="panel" id="t1Panel" data-role="t1">
+          <div class="bar">
+            <div class="panel-id">
+              <span class="chip">
+                <span class="role">T1</span>
+                <span class="sep" aria-hidden="true"></span>
+                <span class="lang" id="t1Lang">ZH-TW</span>
+              </span>
+              <span class="count" id="t1Status" aria-live="polite"></span>
+              <span class="count" id="t1Count"></span>
+            </div>
+            <div class="actions">
+              <button class="icon" id="btnSpeak1" aria-label="Read aloud translation 1" title="朗讀">朗讀</button>
+              <button class="icon" id="btnCopy1" aria-label="Copy translation 1" title="Copy" disabled="">複製</button>
+              <select class="tone-select" id="toneSelect1" aria-label="Tone for translations" title="語氣"></select>
+              <button class="icon primary" id="btnRefine1" aria-label="Refine translation 1" title="Refine" disabled="">潤稿</button>
+              <button class="icon" id="btnDiff1" aria-label="Toggle diff view" title="顯示差異" style="display:none">差異</button>
+              <button class="icon" id="btnReverse1" aria-label="Reverse translate 1" title="反譯驗證" disabled="">反譯</button>
+              <button class="icon icon-close" id="btnHide1" aria-label="Hide translation 1" title="隱藏譯文">X</button>
+            </div>
+          </div>
+          <div class="panel-body" id="t1Body">
+            <div class="output-text" id="out1" contenteditable="true" role="textbox" aria-label="Translation 1" data-placeholder="譯文將顯示在此，翻譯後可直接編輯…"></div>
+            <div class="reverse-col" id="rev1" style="display:none">
+              <div class="reverse-header">
+                <span class="chip">
+                  <span class="role">Back</span>
+                  <span class="sep" aria-hidden="true"></span>
+                  <span class="lang" id="rev1Lang">反譯</span>
+                </span>
+                <span style="flex:1"></span>
+                <button class="icon" id="btnCopyRev1" aria-label="Copy reverse 1" title="Copy">複製</button>
+                <button class="icon" id="btnCloseRev1" aria-label="Close reverse 1" title="Close">關閉</button>
+              </div>
+              <div class="output-text reverse-text" id="revOut1" contenteditable="false" data-placeholder="反譯結果…"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="divider" id="divider" title="Drag to resize"></div>
+
+        <section class="panel" id="t2Panel" data-role="t2">
+          <div class="bar">
+            <div class="panel-id">
+              <span class="chip">
+                <span class="role">T2</span>
+                <span class="sep" aria-hidden="true"></span>
+                <span class="lang" id="t2Lang">JA</span>
+              </span>
+              <span class="count" id="t2Status" aria-live="polite"></span>
+              <span class="count" id="t2Count"></span>
+            </div>
+            <div class="actions">
+              <button class="icon" id="btnSpeak2" aria-label="Read aloud translation 2" title="朗讀">朗讀</button>
+              <button class="icon" id="btnCopy2" aria-label="Copy translation 2" title="Copy" disabled="">複製</button>
+              <select class="tone-select" id="toneSelect2" aria-label="Tone for translations" title="語氣"></select>
+              <button class="icon primary" id="btnRefine2" aria-label="Refine translation 2" title="Refine" disabled="">潤稿</button>
+              <button class="icon" id="btnDiff2" aria-label="Toggle diff view" title="顯示差異" style="display:none">差異</button>
+              <button class="icon" id="btnReverse2" aria-label="Reverse translate 2" title="反譯驗證" disabled="">反譯</button>
+              <button class="icon icon-close" id="btnHide2" aria-label="Hide translation 2" title="隱藏譯文">X</button>
+            </div>
+          </div>
+          <div class="panel-body" id="t2Body">
+            <div class="output-text" id="out2" contenteditable="true" role="textbox" aria-label="Translation 2" data-placeholder="譯文將顯示在此，翻譯後可直接編輯…"></div>
+            <div class="reverse-col" id="rev2" style="display:none">
+              <div class="reverse-header">
+                <span class="chip">
+                  <span class="role">Back</span>
+                  <span class="sep" aria-hidden="true"></span>
+                  <span class="lang" id="rev2Lang">反譯</span>
+                </span>
+                <span style="flex:1"></span>
+                <button class="icon" id="btnCopyRev2" aria-label="Copy reverse 2" title="Copy">複製</button>
+                <button class="icon" id="btnCloseRev2" aria-label="Close reverse 2" title="Close">關閉</button>
+              </div>
+              <div class="output-text reverse-text" id="revOut2" contenteditable="false" data-placeholder="反譯結果…"></div>
+            </div>
+          </div>
+        </section>
+    </div>
+  </div>
+
+  <!-- TTS: floating stop button -->
+    <button class="stop-fab" id="stopFab" aria-label="Stop reading aloud">停止朗讀</button>
+
+  <!-- v2: Chat sidebar -->
+  <div class="chat-scrim" id="chatScrim"></div>
+  <aside class="chat-sidebar" id="chatSidebar" role="complementary" aria-label="AI assistant">
+    <div class="chat-header">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+        <span class="chat-title">Assistant</span>
+        <span class="chat-tag">AI 助手</span>
+      </div>
+      <div class="chat-header-actions">
+        <button class="icon" id="btnClearChat" aria-label="Clear chat history" title="清除歷史">清除</button>
+        <button class="icon icon-close" id="btnCloseChat" aria-label="Close chat" title="Close">X</button>
+      </div>
+    </div>
+    <div class="chat-list" id="chatList" aria-live="polite"></div>
+    <div class="chat-input-row">
+      <textarea id="chatInput" placeholder="詢問 AI… (Enter 送出 · Shift+Enter 換行)" rows="1" spellcheck="false"></textarea>
+        <button class="icon primary" id="btnSendChat" aria-label="Send" title="Send (Enter)">送出</button>
+    </div>
+  </aside>
+
+  <!-- v2: Selection tooltip (Ask AI) -->
+  <div class="selection-tooltip" id="selectionTooltip" role="tooltip">
+    <button id="btnAskAI" type="button">❓ 問 AI</button>
+  </div>
+
+  <!-- Toast host -->
+  <div id="toastHost"></div>
+
+  <script>
+    // --- Configuration ---
+    const CONFIG = {
+      DEBOUNCE_MS: 500,
+      TEMP_TRANSLATE: 0.1,
+      TEMP_REFINE_AUTO: 0.4,
+      TEMP_REFINE_MANUAL: 0.7,
+      SPLIT_MIN: 0.2,
+      SPLIT_MAX: 0.8,
+      MOBILE_BREAKPOINT: 900,
+      API_BASE: 'https://api.openai.com/v1',
+      TTS_BASE: 'https://texttospeech.googleapis.com/v1',
+      TTS_TIMEOUT_MS: 60000,
+      COPY_FLASH_MS: 1200,
+      TOAST_MS: 3500,
+      UNDO_MS: 5000,
+      TOAST_COOLDOWN_MS: 800,
+      SRC_PERSIST_DEBOUNCE_MS: 1000,
+      SRC_PANEL_RATIO: 1 / 3,
+    };
+
+    // Threat model note for API_KEY / TTS_KEY in localStorage:
+    //   This is a single-file, single-user, BYO-key tool with no server. Keys are
+    //   stored in localStorage so they persist across reloads without re-entry.
+    //   Risk: any DOM XSS in this page can read both keys directly. Defences in
+    //   place — toast text-by-default (B4), markdown URL whitelist, escapeHTML on
+    //   every external string that reaches the DOM, no third-party iframes/scripts
+    //   beyond Google Fonts CSS. If the threat model ever expands (shared device,
+    //   third-party scripts, embedded in a larger app), move keys to sessionStorage
+    //   or in-memory + prompt-on-load, or proxy through a backend.
+    const STORAGE_KEYS = {
+      API_KEY: 'openai_key',
+      TTS_KEY: 'tri_ttskey',
+      MODEL: 'openai_model',
+      AUTO: 'tri_auto',
+      AUTO_REFINE: 'tri_auto_refine',
+      SPLIT: 'tri_split',
+      LAST_MODEL: 'tri_last_model',
+      THEME: 'tri_theme',
+      SRC_TEXT: 'tri_src_text',
+      LANG_OVERRIDE: 'tri_lang_override',
+      // v2
+      GLOSSARY: 'tri_glossary',
+      TONE: 'tri_tone',
+      // v2 phase 3
+      CHAT_HISTORY: 'tri_chat_history',
+    };
+
+    const CHAT_HISTORY_LIMIT = 50;       // total persisted
+    const CHAT_API_WINDOW = 20;          // recent N messages sent to API
+
+    const MODEL_FALLBACK_CHAIN = ['gpt-5.3-instant','gpt-5.4','gpt-5.2','gpt-5.1','gpt-4o'];
+
+    // --- v2: Tone definitions ---
+    const TONE_CONFIG = {
+      '': null, // neutral / default
+      'friendly': {
+        label: '親切',
+        prompt: 'Tone: warm, friendly, approachable. Use natural and conversational phrasing while keeping the meaning exact.',
+      },
+      'ja-business': {
+        label: '日式商務',
+        prompt: 'Tone: Japanese business register. For Japanese output, use 丁寧語/敬語 (です・ます調 with appropriate 尊敬語/謙譲語 where suitable). For English/Chinese, use polite, respectful business language with formal vocabulary.',
+      },
+      'concise': {
+        label: '簡潔',
+        prompt: 'Tone: concise, no filler. Prefer short sentences, strip redundant words, but never drop meaning.',
+      },
+      'technical': {
+        label: '技術',
+        prompt: 'Tone: technical, precise. Strictly preserve terminology, code, identifiers, units, numbers, and technical idioms.',
+      },
+      'respectful': {
+        label: '對上級的尊重',
+        prompt: 'Tone: deferential and respectful, suitable for addressing a superior. Use elevated polite forms (Japanese 敬語; Chinese 您/尊稱; English formal "would/may" register).',
+      },
+    };
+    const TONE_SELECT_LABELS = {
+      '': '語氣：中立',
+      'friendly': '語氣：親切',
+      'ja-business': '語氣：日式商務',
+      'concise': '語氣：簡潔',
+      'technical': '語氣：技術',
+      'respectful': '語氣：對上級',
+    };
+
+    // --- v2: Pre-edit modes ---
+    const PREEDIT_CONFIG = {
+      'format': {
+        label: '格式清理',
+        system: 'You are a text formatter. Task: Clean up formatting only — remove unwanted line breaks within sentences (often from PDF copy-paste), normalize whitespace, keep paragraph structure intact. DO NOT rewrite, translate, summarize, or change wording. Output the cleaned text only, no explanation.',
+      },
+      'correct': {
+        label: '校正錯字',
+        system: 'You are a proofreader. Task: Fix typos, grammatical errors, and punctuation. DO NOT change meaning, tone, or style. Preserve the original language. Output the corrected text only, no explanation.',
+      },
+      'clarify': {
+        label: '釐清語意',
+        system: 'You are an editor. Task: Rewrite vague or ambiguous sentences to be clearer and more direct, while preserving the original intent and language. Do not add new information. Output the clarified text only, no explanation.',
+      },
+      'business': {
+        label: '商務口氣',
+        system: 'You are an editor. Task: Rewrite the text into a professional, formal business register, while preserving the original language and meaning. Use appropriate formal vocabulary. Output the rewritten text only, no explanation.',
+      },
+      'plain': {
+        label: '白話易懂',
+        system: 'You are an editor. Task: Rewrite the text into plain, accessible language that a general reader can understand quickly. Preserve original meaning and language. Replace jargon with plain equivalents where appropriate. Output the rewritten text only, no explanation.',
+      },
+      'humorous': {
+        label: '幽默',
+        system: 'You are an editor. Task: Add a light, witty undertone to the text while strictly preserving the original meaning and language. Subtle humor only — do not turn it into a joke. Output the rewritten text only, no explanation.',
+      },
+    };
+
+    // --- Language system ---
+    const LANGUAGES = {
+      'en': {
+        display: 'EN',
+        tts: { cloudLang: 'en-US', cloudVoice: 'en-US-Neural2-D', localLang: 'en-US' },
+        detect: (text) => true,
+        targets: ['zh-TW', 'ja'],
+        promptName: 'concise, standard English',
+        promptExtra: '\nFor English: Use clear, natural, standard written English. Avoid awkward literal phrasing.',
+        translateExtra: '',
+        refineExtra: '\nFor English: Use clear, natural, standard written English. Avoid awkward literal phrasing.',
+      },
+      'zh-TW': {
+        display: 'ZH-TW',
+        tts: { cloudLang: 'cmn-TW', cloudVoice: 'cmn-TW-Wavenet-A', localLang: 'zh-TW' },
+        detect: (text) => /[\u4e00-\u9fff]/.test(text),
+        targets: ['en', 'ja'],
+        promptName: '繁體中文（台灣）',
+        translateExtra: '\nTaiwan style: 用詞以台灣常用說法，避免簡體用語，標點採全形（、，。）；如需括號註記英文原詞，置於首次出現處。',
+        refineExtra: '\nFor zh-TW: 用詞以台灣常用說法，避免簡體／大陸用語，標點採全形（、，。）；口吻自然、專業但不僵硬。',
+      },
+      'ja': {
+        display: 'JA',
+        tts: { cloudLang: 'ja-JP', cloudVoice: 'ja-JP-Neural2-B', localLang: 'ja-JP' },
+        detect: (text) => /[\u3040-\u30ff]/.test(text) || /[々ー]/.test(text),
+        targets: ['en', 'zh-TW'],
+        promptName: '日本語',
+        translateExtra: '\nJapanese style: 技術・一般文書どちらでも読みにやすい標準的な文体で、簡潔に訳す。',
+        refineExtra: '\nFor Japanese: 自然で読みやすい標準的な文体で、専門性を保ちつつ不自然な直訳表現を避ける。',
+      },
+    };
+
+    // --- Panel abstraction ---
+    const PANELS = [
+      { id: 0, key: 'src', panelId: 'srcPanel', btnSpeakId: 'btnSpeakSrc', outputId: null, btnCopyId: 'btnCopySrc', btnRefineId: null, btnReverseId: null, statusId: null, langId: 'srcLang', countId: null },
+      { id: 1, key: 't1', panelId: 't1Panel', btnSpeakId: 'btnSpeak1', outputId: 'out1', btnCopyId: 'btnCopy1', btnRefineId: 'btnRefine1', btnReverseId: 'btnReverse1', statusId: 't1Status', langId: 't1Lang', countId: 't1Count' },
+      { id: 2, key: 't2', panelId: 't2Panel', btnSpeakId: 'btnSpeak2', outputId: 'out2', btnCopyId: 'btnCopy2', btnRefineId: 'btnRefine2', btnReverseId: 'btnReverse2', statusId: 't2Status', langId: 't2Lang', countId: 't2Count' },
+    ];
+
+    // --- Utilities ---
+    function clamp(n, a, b) { return Math.min(b, Math.max(a, n)); }
+
+    function isAbortError(e) {
+      return e && (e.name === 'AbortError' || e.code === 20);
+    }
+
+    async function safeReadText(res) {
+      try { return await res.text(); } catch { return ''; }
+    }
+
+    function isInvalidModelError(status, bodyText) {
+      const t = (bodyText || '').toLowerCase();
+      return status === 404 || /invalid_model|model.*not found|no such model|unknown model/.test(t);
+    }
+
+    // Surface non-"stop" finish_reason to the user. 'length' / 'content_filter'
+    // are silent failure modes — the result is shown but truncated or filtered.
+    function warnFinishReason(fr, label) {
+      if (!fr || fr === 'stop') return;
+      if (fr === 'length') {
+        toast(`⚠ ${label}：回覆達到長度上限，可能被截斷`, 'error', 6000);
+      } else if (fr === 'content_filter') {
+        toast(`⚠ ${label}：被內容過濾擋下`, 'error', 6000);
+      } else {
+        toast(`⚠ ${label}：finish_reason=${fr}`, 'error', 5000);
+      }
+    }
+
+    // --- Toast system ---
+    const toastHost = document.getElementById('toastHost');
+    let _lastToastMsg = '';
+    let _lastToastTime = 0;
+
+    // Toast is split into two paths:
+    //   - toast(msg, type, duration): TEXT-by-default. Renders msg via textContent
+    //     so external input (filenames, API error messages, exception text, etc.)
+    //     cannot inject markup.
+    //   - toastHTML(html, type, duration): TRUSTED HTML path for internal callers
+    //     that need link/button markup (toastUndo, promptImportMode). Any user-
+    //     supplied text concatenated into html MUST be escaped by the caller.
+    function _buildToast(applyContent, type, durationMs, dedupKey) {
+      const now = Date.now();
+      // Dedup: same message within cooldown window
+      if (dedupKey === _lastToastMsg && (now - _lastToastTime) < CONFIG.TOAST_COOLDOWN_MS) return null;
+      _lastToastMsg = dedupKey;
+      _lastToastTime = now;
+
+      const duration = durationMs || CONFIG.TOAST_MS;
+      const item = document.createElement('div');
+      item.className = 'toast-item' + (type ? ' toast-' + type : '');
+      applyContent(item);
+      toastHost.appendChild(item);
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => item.classList.add('show'));
+      });
+
+      const dismiss = () => {
+        item.classList.remove('show');
+        item.classList.add('out');
+        setTimeout(() => item.remove(), 200);
+      };
+
+      item.addEventListener('click', (e) => {
+        if (e.target.classList.contains('undo-link')) return;
+        dismiss();
+      });
+
+      const timer = setTimeout(dismiss, duration);
+      return { item, dismiss, timer };
+    }
+
+    function toast(msg, type, durationMs) {
+      const text = String(msg ?? '');
+      return _buildToast((item) => { item.textContent = text; }, type, durationMs, text);
+    }
+
+    // Trusted-HTML toast. Use ONLY for internal markup (undo links, action
+    // buttons). Any external text concatenated into `html` MUST be escapeHTML'd
+    // by the caller before being passed in.
+    function toastHTML(html, type, durationMs) {
+      const s = String(html ?? '');
+      return _buildToast((item) => { item.innerHTML = s; }, type, durationMs, s);
+    }
+
+    function toastError(msg) {
+      toast(msg, 'error', 5000);
+    }
+
+    function toastUndo(msg, onUndo) {
+      // msg is treated as plain text; we escape it before splicing into the
+      // trusted-HTML toast so any caller-supplied text (e.g. file names) is safe.
+      const safeMsg = escapeHTML(String(msg ?? ''));
+      const t = toastHTML(safeMsg + '<span class="undo-link">復原</span>', 'undo', CONFIG.UNDO_MS);
+      if (!t) return;
+      const link = t.item.querySelector('.undo-link');
+      if (link) {
+        link.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearTimeout(t.timer);
+          t.dismiss();
+          if (onUndo) onUndo();
+        });
+      }
+    }
+
+    // --- CJK-aware diff ---
+    // Tokenizes text so CJK characters are individual tokens,
+    // while Latin/whitespace words stay grouped.
+    const CJK_RE = /[\u3000-\u9fff\uf900-\ufaff\u{20000}-\u{2fa1f}]/u;
+    function tokenize(text) {
+      const tokens = [];
+      let buf = '';
+      for (const ch of text) {
+        if (CJK_RE.test(ch)) {
+          if (buf) { tokens.push(buf); buf = ''; }
+          tokens.push(ch);
+        } else if (/\s/.test(ch)) {
+          if (buf) { tokens.push(buf); buf = ''; }
+          tokens.push(ch);
+        } else {
+          buf += ch;
+        }
+      }
+      if (buf) tokens.push(buf);
+      return tokens;
+    }
+
+    function computeDiff(oldText, newText) {
+      const oldTok = tokenize(oldText);
+      const newTok = tokenize(newText);
+      const m = oldTok.length, n = newTok.length;
+      if (m > 2000 || n > 2000) return null;
+
+      // Myers-like LCS with DP
+      const dp = Array.from({ length: m + 1 }, () => new Uint16Array(n + 1));
+      for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+          dp[i][j] = oldTok[i - 1] === newTok[j - 1]
+            ? dp[i - 1][j - 1] + 1
+            : Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+      }
+
+      const raw = [];
+      let i = m, j = n;
+      while (i > 0 || j > 0) {
+        if (i > 0 && j > 0 && oldTok[i - 1] === newTok[j - 1]) {
+          raw.unshift({ type: 'same', text: oldTok[i - 1] });
+          i--; j--;
+        } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+          raw.unshift({ type: 'add', text: newTok[j - 1] });
+          j--;
+        } else {
+          raw.unshift({ type: 'del', text: oldTok[i - 1] });
+          i--;
+        }
+      }
+
+      // Merge consecutive runs of same type to reduce span count
+      const merged = [];
+      for (const r of raw) {
+        const last = merged[merged.length - 1];
+        if (last && last.type === r.type) {
+          last.text += r.text;
+        } else {
+          merged.push({ type: r.type, text: r.text });
+        }
+      }
+      return merged;
+    }
+
+    function escapeHTML(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderDiffHTML(diff) {
+      if (!diff) return null;
+      let html = '';
+      for (const d of diff) {
+        const escaped = escapeHTML(d.text);
+        if (d.type === 'same') {
+          html += escaped;
+        } else if (d.type === 'add') {
+          html += '<span class="diff-add">' + escaped + '</span>';
+        } else {
+          html += '<span class="diff-del">' + escaped + '</span>';
+        }
+      }
+      return html;
+    }
+
+    // --- State ---
+    const state = {
+      apiKey: (localStorage.getItem(STORAGE_KEYS.API_KEY) || '').trim(),
+      ttsApiKey: (localStorage.getItem(STORAGE_KEYS.TTS_KEY) || '').trim(),
+      model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'gpt-5.3-instant',
+      auto: (localStorage.getItem(STORAGE_KEYS.AUTO) ?? '1') === '1',
+      autoRefine: (localStorage.getItem(STORAGE_KEYS.AUTO_REFINE) ?? '1') === '1',
+      split: clamp(parseFloat(localStorage.getItem(STORAGE_KEYS.SPLIT) || '0.5') || 0.5, CONFIG.SPLIT_MIN, CONFIG.SPLIT_MAX),
+      lastWorkingModel: localStorage.getItem(STORAGE_KEYS.LAST_MODEL) || null,
+      theme: localStorage.getItem(STORAGE_KEYS.THEME) || 'dark',
+      // Source-language override used to be exposed in the masthead. The UI now
+      // relies on auto-detect so stale stored overrides cannot silently force the
+      // wrong source language.
+      langOverride: 'auto',
+      jobId: 0,
+      activeJobId: 0,
+      detected: null,
+      busy: false,
+      refining: { 1: false, 2: false },
+      controller: null,
+      // Per-panel reverse-translate state. Reverse runs on its own controller so
+      // that two rapid clicks do not race in revOut, and so that abortInFlight
+      // can cancel it independently of the main translation controller.
+      reverseController: { 1: null, 2: null },
+      reverseJobId: { 1: 0, 2: 0 },
+      debounce: null,
+      srcPersistTimer: null,
+      // Undo state
+      undoSnapshot: null,
+      // TTS state. ttsController aborts the in-flight Cloud TTS fetch on stop;
+      // ttsToken is a monotonically increasing tag — every speak() bumps it, and
+      // a fetch resolution whose token is stale is silently discarded so an
+      // audio file downloaded after the user pressed stop does not still play.
+      speaking: false,
+      speakingPanel: null,
+      audioEl: null,
+      ttsController: null,
+      ttsToken: 0,
+      ttsTimeout: null,
+      // Diff: store {diffHTML, cleanText} per output panel, and current view mode
+      diff: { 1: null, 2: null },           // {diffHTML, cleanText} or null
+      diffShowing: { 1: false, 2: false },   // is diff view currently shown?
+      // v2
+      glossary: (() => {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.GLOSSARY) || '[]'); }
+        catch { return []; }
+      })(),
+      tone: localStorage.getItem(STORAGE_KEYS.TONE) || '',
+      preediting: false,
+      preeditController: null,
+      glossaryController: null,
+      _skipNextAuto: false,   // suppress autoTranslate after pre-edit / file import
+      // v2 phase 3
+      chatHistory: (() => {
+        try {
+          const v = JSON.parse(localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY) || '[]');
+          return Array.isArray(v) ? v : [];
+        } catch { return []; }
+      })(),
+      chatBusy: false,
+      chatController: null,
+      chatOpen: false,
+      _selection: null,         // {text, source: 'src'|'out1'|'out2'}
+    };
+
+    // --- DOM ---
+    const $ = (id) => document.getElementById(id);
+    const el = {
+      settingsOverlay: $('settingsOverlay'),
+      btnSettings: $('btnSettings'),
+      btnCloseSettings: $('btnCloseSettings'),
+      btnDone: $('btnDone'),
+      btnTheme: $('btnTheme'),
+      langOverride: $('langOverride'),
+      apiKey: $('apiKey'),
+      model: $('model'),
+      auto: $('auto'),
+      autoRefine: $('autoRefine'),
+      src: $('src'),
+      srcLang: $('srcLang'),
+      srcCount: $('srcCount'),
+      btnSpeakSrc: $('btnSpeakSrc'),
+      btnTranslate: $('btnTranslate'),
+      btnCopySrc: $('btnCopySrc'),
+      btnClear: $('btnClear'),
+      t1Lang: $('t1Lang'),
+      t2Lang: $('t2Lang'),
+      out1: $('out1'),
+      out2: $('out2'),
+      t1Status: $('t1Status'),
+      t2Status: $('t2Status'),
+      t1Count: $('t1Count'),
+      t2Count: $('t2Count'),
+      btnCopy1: $('btnCopy1'),
+      btnCopy2: $('btnCopy2'),
+      btnRefine1: $('btnRefine1'),
+      btnRefine2: $('btnRefine2'),
+      btnReverse1: $('btnReverse1'),
+      btnReverse2: $('btnReverse2'),
+      outs: $('outs'),
+      divider: $('divider'),
+      ttsKey: $('ttsKey'),
+      btnSpeak1: $('btnSpeak1'),
+      btnSpeak2: $('btnSpeak2'),
+      stopFab: $('stopFab'),
+      rev1: $('rev1'),
+      rev2: $('rev2'),
+      revOut1: $('revOut1'),
+      revOut2: $('revOut2'),
+      rev1Lang: $('rev1Lang'),
+      rev2Lang: $('rev2Lang'),
+      btnCopyRev1: $('btnCopyRev1'),
+      btnCopyRev2: $('btnCopyRev2'),
+      btnCloseRev1: $('btnCloseRev1'),
+      btnCloseRev2: $('btnCloseRev2'),
+      btnDiff1: $('btnDiff1'),
+      btnDiff2: $('btnDiff2'),
+      btnHide1: $('btnHide1'),
+      btnHide2: $('btnHide2'),
+      t1Body: $('t1Body'),
+      t2Body: $('t2Body'),
+      hDivider: $('hDivider'),
+      grid: document.querySelector('.grid'),
+      srcPanel: $('srcPanel'),
+      restore1: $('restore1'),
+      restore2: $('restore2'),
+      btnRestore1: $('btnRestore1'),
+      btnRestore2: $('btnRestore2'),
+      restore1Lang: $('restore1Lang'),
+      restore2Lang: $('restore2Lang'),
+      // v2
+      btnGlossary: $('btnGlossary'),
+      glossaryOverlay: $('glossaryOverlay'),
+      btnCloseGlossary: $('btnCloseGlossary'),
+      btnExtractGlossary: $('btnExtractGlossary'),
+      btnImportGlossary: $('btnImportGlossary'),
+      btnExportGlossary: $('btnExportGlossary'),
+      btnClearGlossary: $('btnClearGlossary'),
+      glossaryFileInput: $('glossaryFileInput'),
+      glossarySuggestions: $('glossarySuggestions'),
+      btnDismissSuggestions: $('btnDismissSuggestions'),
+      suggestionList: $('suggestionList'),
+      glossaryNewSource: $('glossaryNewSource'),
+      glossaryNewTrans: $('glossaryNewTrans'),
+      btnAddGlossary: $('btnAddGlossary'),
+      glossaryTbody: $('glossaryTbody'),
+      glossaryEmpty: $('glossaryEmpty'),
+      toneSelect1: $('toneSelect1'),
+      toneSelect2: $('toneSelect2'),
+      btnImport: $('btnImport'),
+      fileInput: $('fileInput'),
+      btnPreedit: $('btnPreedit'),
+      preeditDropdown: $('preeditDropdown'),
+      // v2 phase 3
+      btnChat: $('btnChat'),
+      chatSidebar: $('chatSidebar'),
+      chatScrim: $('chatScrim'),
+      btnCloseChat: $('btnCloseChat'),
+      btnClearChat: $('btnClearChat'),
+      chatList: $('chatList'),
+      chatInput: $('chatInput'),
+      btnSendChat: $('btnSendChat'),
+      selectionTooltip: $('selectionTooltip'),
+      btnAskAI: $('btnAskAI'),
+    };
+
+    // Populate model <select>
+    MODEL_FALLBACK_CHAIN.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      el.model.appendChild(opt);
+    });
+
+    // Init inputs
+    el.apiKey.value = state.apiKey;
+    el.ttsKey.value = state.ttsApiKey;
+    el.model.value = state.model;
+    el.auto.checked = state.auto;
+    el.autoRefine.checked = state.autoRefine;
+    el.langOverride.value = state.langOverride;
+    applySplit(state.split);
+
+    // Apply theme
+    applyTheme(state.theme);
+
+    // Restore source text from session persistence
+    const savedSrc = localStorage.getItem(STORAGE_KEYS.SRC_TEXT) || '';
+    if (savedSrc) {
+      el.src.value = savedSrc;
+    }
+
+    // ContentEditable: force plain-text paste
+    function forcePlainPaste(e) {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+      document.execCommand('insertText', false, text);
+    }
+    el.out1.addEventListener('paste', forcePlainPaste);
+    el.out2.addEventListener('paste', forcePlainPaste);
+
+    // ContentEditable: update char count on input.
+    // Manual edits invalidate any stored diff — its cleanText no longer matches
+    // the panel, and toggling diff would otherwise overwrite the user's edits.
+    el.out1.addEventListener('input', () => {
+      if (state.diff && state.diff[1]) clearDiff(1);
+      updateOutputCount(1);
+    });
+    el.out2.addEventListener('input', () => {
+      if (state.diff && state.diff[2]) clearDiff(2);
+      updateOutputCount(2);
+    });
+
+    // Preload browser voices
+    if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+    // --- Panel helpers ---
+    function getPanel(which) { return PANELS[which]; }
+
+    function getPanelBtn(which) {
+      return $(getPanel(which).btnSpeakId);
+    }
+
+    function getPanelEl(which) {
+      return $(getPanel(which).panelId);
+    }
+
+    function getPanelOutput(which) {
+      if (which === 0) return el.src;
+      return $(getPanel(which).outputId);
+    }
+
+    function getOutputText(which) {
+      if (which === 0) return el.src.value;
+      // When diff view is showing, the DOM contains interleaved add/del spans;
+      // textContent would return mixed text. Return the canonical clean text instead.
+      if (state.diffShowing && state.diffShowing[which] && state.diff && state.diff[which]) {
+        return state.diff[which].cleanText;
+      }
+      return $(getPanel(which).outputId).textContent;
+    }
+
+    function setOutputText(which, text) {
+      const outEl = $(getPanel(which).outputId);
+      outEl.textContent = text;
+      updateOutputCount(which);
+    }
+
+    function updateOutputCount(which) {
+      const countEl = $(getPanel(which).countId);
+      if (!countEl) return;
+      const text = getOutputText(which);
+      countEl.textContent = text.trim() ? String(text.length) : '';
+    }
+
+    // --- Theme ---
+    function applyTheme(theme) {
+      state.theme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+      el.btnTheme.textContent = '主題';
+      el.btnTheme.title = theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    }
+
+    el.btnTheme.addEventListener('click', () => {
+      applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+    });
+
+    // --- UX helpers ---
+    function showError(msg) {
+      if (!msg) return;
+      toastError(msg);
+    }
+
+    function setBusy(isBusy) {
+      state.busy = isBusy;
+      el.btnTranslate.disabled = isBusy;
+
+      const out1Text = getOutputText(1).trim();
+      const out2Text = getOutputText(2).trim();
+
+      el.btnRefine1.disabled = isBusy || state.refining[1] || !out1Text;
+      el.btnRefine2.disabled = isBusy || state.refining[2] || !out2Text;
+      el.btnReverse1.disabled = isBusy || !out1Text;
+      el.btnReverse2.disabled = isBusy || !out2Text;
+      el.btnCopySrc.disabled = !el.src.value.trim();
+      el.btnCopy1.disabled = !out1Text;
+      el.btnCopy2.disabled = !out2Text;
+      el.btnClear.disabled = !el.src.value.trim() && !out1Text && !out2Text;
+
+      // Skeleton loading
+      const t1p = $('t1Panel'), t2p = $('t2Panel');
+      t1p.classList.toggle('loading', isBusy && !out1Text);
+      t2p.classList.toggle('loading', isBusy && !out2Text);
+    }
+
+    function autoResizeTextarea() {
+      // With flex layout, textarea fills its panel automatically
+    }
+
+    function setStatus(which, txt) {
+      const statusEl = which === 1 ? el.t1Status : el.t2Status;
+      statusEl.textContent = txt || '';
+    }
+
+    function setLangChips(srcLang) {
+      const targets = srcLang ? getTargets(srcLang) : ['zh-TW', 'ja'];
+      el.srcLang.textContent = srcLang ? LANGUAGES[srcLang].display : '—';
+      el.t1Lang.textContent = LANGUAGES[targets[0]].display;
+      el.t2Lang.textContent = LANGUAGES[targets[1]].display;
+      el.restore1Lang.textContent = LANGUAGES[targets[0]].display;
+      el.restore2Lang.textContent = LANGUAGES[targets[1]].display;
+      return { t1: targets[0], t2: targets[1] };
+    }
+
+    function clearOutputs() {
+      el.out1.textContent = '';
+      el.out2.textContent = '';
+      setStatus(1, '');
+      setStatus(2, '');
+      // Clear diff before counting: getOutputText() returns state.diff.cleanText
+      // while diff view is showing, so updateOutputCount would otherwise read the
+      // stale cleanText length even though textContent was just blanked.
+      clearDiff(1);
+      clearDiff(2);
+      updateOutputCount(1);
+      updateOutputCount(2);
+    }
+
+    // --- Diff toggle ---
+    function storeDiff(which, draft, refined) {
+      const diff = computeDiff(draft, refined);
+      const diffHTML = renderDiffHTML(diff);
+      if (!diffHTML || refined === draft) {
+        clearDiff(which);
+        return;
+      }
+      state.diff[which] = { diffHTML, cleanText: refined };
+      state.diffShowing[which] = false;
+      const btn = which === 1 ? el.btnDiff1 : el.btnDiff2;
+      btn.style.display = '';
+      btn.classList.remove('diff-active');
+      // We're showing the clean refined text — must remain editable.
+      const outEl = which === 1 ? el.out1 : el.out2;
+      outEl.contentEditable = 'true';
+    }
+
+    function clearDiff(which) {
+      state.diff[which] = null;
+      state.diffShowing[which] = false;
+      const btn = which === 1 ? el.btnDiff1 : el.btnDiff2;
+      btn.style.display = 'none';
+      btn.classList.remove('diff-active');
+      // Restore editability — diff view sets it to false; without this restore,
+      // a fresh translation while diff was showing leaves the panel uneditable.
+      const outEl = which === 1 ? el.out1 : el.out2;
+      outEl.contentEditable = 'true';
+    }
+
+    function toggleDiff(which) {
+      const data = state.diff[which];
+      if (!data) return;
+      const outEl = which === 1 ? el.out1 : el.out2;
+      const btn = which === 1 ? el.btnDiff1 : el.btnDiff2;
+
+      if (state.diffShowing[which]) {
+        // Switch back to clean text
+        outEl.textContent = data.cleanText;
+        outEl.contentEditable = 'true';
+        state.diffShowing[which] = false;
+        btn.classList.remove('diff-active');
+        btn.title = '顯示差異';
+      } else {
+        // Show diff
+        outEl.innerHTML = data.diffHTML;
+        outEl.contentEditable = 'false';
+        state.diffShowing[which] = true;
+        btn.classList.add('diff-active');
+        btn.title = '隱藏差異';
+      }
+      updateOutputCount(which);
+    }
+
+    el.btnDiff1.addEventListener('click', () => toggleDiff(1));
+    el.btnDiff2.addEventListener('click', () => toggleDiff(2));
+
+    // --- Hide/Show translation panel (complete hide) ---
+    state.hidden = { 1: false, 2: false };
+
+    function toggleHidePanel(which) {
+      const isHidden = state.hidden[which];
+      state.hidden[which] = !isHidden;
+      const restoreBar = which === 1 ? el.restore1 : el.restore2;
+      el.outs.classList.toggle(`hide-t${which}`, !isHidden);
+      restoreBar.classList.toggle('show', !isHidden);
+    }
+
+    function restorePanel(which) {
+      state.hidden[which] = false;
+      const restoreBar = which === 1 ? el.restore1 : el.restore2;
+      el.outs.classList.remove(`hide-t${which}`);
+      restoreBar.classList.remove('show');
+    }
+
+    el.btnHide1.addEventListener('click', () => toggleHidePanel(1));
+    el.btnHide2.addEventListener('click', () => toggleHidePanel(2));
+    el.btnRestore1.addEventListener('click', () => restorePanel(1));
+    el.btnRestore2.addEventListener('click', () => restorePanel(2));
+
+    function applySplit(r) {
+      state.split = clamp(r, CONFIG.SPLIT_MIN, CONFIG.SPLIT_MAX);
+      el.outs.style.setProperty('--split', String(state.split));
+      localStorage.setItem(STORAGE_KEYS.SPLIT, String(state.split));
+    }
+
+    function persistConfig(key, value) {
+      localStorage.setItem(key, value);
+    }
+
+    // --- Source text persistence ---
+    function persistSrcText() {
+      if (state.srcPersistTimer) clearTimeout(state.srcPersistTimer);
+      state.srcPersistTimer = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEYS.SRC_TEXT, el.src.value);
+      }, CONFIG.SRC_PERSIST_DEBOUNCE_MS);
+    }
+
+    // --- Copy with visual feedback ---
+    async function copyText(text, btnEl) {
+      const t = (text || '').trim();
+      if (!t) return;
+      try {
+        await navigator.clipboard.writeText(t);
+        if (btnEl) {
+          const orig = btnEl.textContent;
+          btnEl.textContent = '已複製';
+          btnEl.classList.add('copied');
+          setTimeout(() => {
+            btnEl.textContent = orig;
+            btnEl.classList.remove('copied');
+          }, CONFIG.COPY_FLASH_MS);
+        }
+      } catch (e) {
+        console.warn('Clipboard write failed:', e.message);
+      }
+    }
+
+    // --- Divider drag ---
+    (function setupDivider() {
+      let dragging = false;
+      let rect = null;
+      el.divider.addEventListener('pointerdown', (e) => {
+        if (window.matchMedia(`(max-width: ${CONFIG.MOBILE_BREAKPOINT}px)`).matches) return;
+        dragging = true;
+        rect = el.outs.getBoundingClientRect();
+        el.divider.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+      el.divider.addEventListener('pointermove', (e) => {
+        if (!dragging || !rect) return;
+        const x = e.clientX - rect.left;
+        const ratio = x / rect.width;
+        applySplit(ratio);
+      });
+      el.divider.addEventListener('pointerup', () => { dragging = false; rect = null; });
+      el.divider.addEventListener('pointercancel', () => { dragging = false; rect = null; });
+    })();
+
+    // --- Horizontal divider drag (src vs outs height ratio) ---
+    (function setupHDivider() {
+      let dragging = false;
+      let startY = 0;
+      let startSrcRatio = CONFIG.SRC_PANEL_RATIO;
+
+      function applyVSplit(ratio) {
+        const r = clamp(ratio, 0.15, 0.75);
+        startSrcRatio = r;
+        el.srcPanel.style.flex = `${r} 1 0`;
+        el.outs.style.flex = `${1 - r} 1 0`;
+        // Clear any leftover inline styles from textarea
+        el.src.style.minHeight = '';
+        el.src.style.maxHeight = '';
+        el.src.style.height = '';
+      }
+
+      el.hDivider.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startY = e.clientY;
+        const gridRect = el.grid.getBoundingClientRect();
+        const srcRect = el.srcPanel.getBoundingClientRect();
+        startSrcRatio = srcRect.height / gridRect.height;
+        el.hDivider.setPointerCapture(e.pointerId);
+        e.preventDefault();
+        document.body.style.userSelect = 'none';
+      });
+      el.hDivider.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const gridRect = el.grid.getBoundingClientRect();
+        const dy = e.clientY - startY;
+        const newRatio = startSrcRatio + dy / gridRect.height;
+        applyVSplit(newRatio);
+        startY = e.clientY;
+        startSrcRatio = newRatio;
+      });
+      const stopH = () => {
+        dragging = false;
+        document.body.style.userSelect = '';
+      };
+      el.hDivider.addEventListener('pointerup', stopH);
+      el.hDivider.addEventListener('pointercancel', stopH);
+      applyVSplit(CONFIG.SRC_PANEL_RATIO);
+    })();
+
+    // --- Settings modal ---
+    el.btnSettings.addEventListener('click', () => openSettings(true));
+    el.btnCloseSettings.addEventListener('click', () => openSettings(false));
+    el.btnDone.addEventListener('click', () => openSettings(false));
+
+    el.settingsOverlay.addEventListener('click', (e) => {
+      if (e.target === el.settingsOverlay) openSettings(false);
+    });
+
+    // Per-modal slots so that closing modal A does not steal modal B's
+    // remembered opener — settings / glossary / chat each capture and restore
+    // focus independently.
+    let _focusReturnSettings = null;
+    let _focusReturnGlossary = null;
+    let _focusReturnChat = null;
+    function _restoreFocus(node) {
+      if (!node) return;
+      if (!document.body.contains(node)) return;
+      try { node.focus(); } catch {}
+    }
+
+    function openSettings(show) {
+      el.settingsOverlay.classList.toggle('show', !!show);
+      el.settingsOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
+      if (show) {
+        _focusReturnSettings = document.activeElement;
+        el.apiKey.focus();
+        trapFocusIn(el.settingsOverlay.querySelector('.modal'));
+      } else {
+        releaseFocusTrap();
+        _restoreFocus(_focusReturnSettings);
+        _focusReturnSettings = null;
+      }
+    }
+
+    let _focusTrapHandler = null;
+    function trapFocusIn(modalEl) {
+      releaseFocusTrap();
+      _focusTrapHandler = (e) => {
+        if (e.key !== 'Tab') return;
+        const focusable = modalEl.querySelectorAll('input, select, button, [tabindex]:not([tabindex="-1"])');
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      };
+      document.addEventListener('keydown', _focusTrapHandler);
+    }
+    function releaseFocusTrap() {
+      if (_focusTrapHandler) {
+        document.removeEventListener('keydown', _focusTrapHandler);
+        _focusTrapHandler = null;
+      }
+    }
+
+    // --- Settings event handlers ---
+    el.apiKey.addEventListener('input', (e) => {
+      state.apiKey = e.target.value.trim();
+      persistConfig(STORAGE_KEYS.API_KEY, state.apiKey);
+      setBusy(state.busy);
+    });
+
+    el.model.addEventListener('change', (e) => {
+      state.model = e.target.value;
+      persistConfig(STORAGE_KEYS.MODEL, state.model);
+    });
+
+    el.auto.addEventListener('change', (e) => {
+      state.auto = !!e.target.checked;
+      persistConfig(STORAGE_KEYS.AUTO, state.auto ? '1' : '0');
+    });
+
+    el.autoRefine.addEventListener('change', (e) => {
+      state.autoRefine = !!e.target.checked;
+      persistConfig(STORAGE_KEYS.AUTO_REFINE, state.autoRefine ? '1' : '0');
+    });
+
+    el.ttsKey.addEventListener('input', (e) => {
+      state.ttsApiKey = e.target.value.trim();
+      persistConfig(STORAGE_KEYS.TTS_KEY, state.ttsApiKey);
+    });
+
+    el.langOverride.addEventListener('change', (e) => {
+      state.langOverride = e.target.value;
+      persistConfig(STORAGE_KEYS.LANG_OVERRIDE, state.langOverride);
+      // Re-detect and update chips
+      const text = el.src.value.trim();
+      if (text) {
+        const srcLang = resolveSrcLang(text);
+        state.detected = srcLang;
+        setLangChips(srcLang);
+      }
+    });
+
+    // --- TTS ---
+    el.btnSpeakSrc.addEventListener('click', () => toggleSpeak(0));
+    el.btnSpeak1.addEventListener('click', () => toggleSpeak(1));
+    el.btnSpeak2.addEventListener('click', () => toggleSpeak(2));
+    el.stopFab.addEventListener('click', stopSpeaking);
+
+    function toggleSpeak(which) {
+      if (state.speaking && state.speakingPanel === which) {
+        stopSpeaking();
+        return;
+      }
+      const text = getOutputText(which);
+      let lang;
+      if (which === 0) {
+        lang = state.detected || resolveSrcLang(text);
+      } else {
+        const srcLang = state.detected || resolveSrcLang(el.src.value);
+        const targets = getTargets(srcLang);
+        lang = targets[which - 1];
+      }
+      speak(text, lang, which);
+    }
+
+    async function speak(text, lang, which) {
+      if (!text?.trim()) return;
+      if (state.speaking) stopSpeaking();
+
+      const langCfg = LANGUAGES[lang];
+      if (!langCfg?.tts) return;
+      const cfg = langCfg.tts;
+
+      state.speaking = true;
+      state.speakingPanel = which;
+      el.stopFab.classList.add('show');
+
+      // Bump the request token. Any in-flight Cloud TTS resolution whose token
+      // is no longer current will be discarded — that prevents an audio file
+      // downloaded after the user pressed stop / pressed speak again from
+      // playing on top of the new operation.
+      const myToken = ++state.ttsToken;
+
+      const btn = getPanelBtn(which);
+      const panel = getPanelEl(which);
+      btn.textContent = '停止';
+      btn.title = '停止朗讀';
+      btn.setAttribute('aria-label', 'Stop reading aloud');
+      btn.classList.add('speaking');
+      panel.classList.add('speaking-glow');
+
+      const onDone = () => {
+        if (state.ttsTimeout) { clearTimeout(state.ttsTimeout); state.ttsTimeout = null; }
+        btn.textContent = '朗讀';
+        btn.title = '朗讀';
+        btn.setAttribute('aria-label', `Read aloud ${which === 0 ? 'source text' : 'translation ' + which}`);
+        btn.classList.remove('speaking');
+        panel.classList.remove('speaking-glow');
+        state.speaking = false;
+        state.speakingPanel = null;
+        state.audioEl = null;
+        el.stopFab.classList.remove('show');
+      };
+
+      state.ttsTimeout = setTimeout(() => {
+        if (state.speaking && state.speakingPanel === which) {
+          console.warn('TTS timeout reached, forcing stop');
+          stopSpeaking();
+        }
+      }, CONFIG.TTS_TIMEOUT_MS);
+
+      if (state.ttsApiKey) {
+        const ctrl = new AbortController();
+        state.ttsController = ctrl;
+        try {
+          const audio = await speakCloud(text, cfg.cloudLang, cfg.cloudVoice, ctrl.signal);
+          // Stale-result guard: stopSpeaking() / a second speak() bumps the token
+          // and aborts the controller, but a fetch that resolved a millisecond
+          // before the abort can still land here. Discard it silently.
+          if (state.ttsToken !== myToken) {
+            try { audio.pause(); } catch {}
+            return;
+          }
+          state.audioEl = audio;
+          audio.onended = onDone;
+          audio.onerror = onDone;
+          // play() is intentionally AFTER state.audioEl assignment so a stop
+          // click between this point and the next event-loop tick can still
+          // pause the audio via state.audioEl. If play() itself rejects (no
+          // user gesture, autoplay blocked, audio context suspended, …) we
+          // must reset the speaking UI — otherwise the panel/button/FAB stay
+          // stuck in the "speaking" state forever. Guard with the token so a
+          // late rejection from a superseded operation does not clobber a
+          // newer one that has already started.
+          audio.play().catch(() => {
+            if (state.ttsToken === myToken) onDone();
+          });
+          return;
+        } catch (e) {
+          if (e?.name === 'AbortError') return; // intentional cancel — UI was reset by stopSpeaking
+          console.warn('Cloud TTS failed, falling back to local:', e.message);
+        } finally {
+          if (state.ttsController === ctrl) state.ttsController = null;
+        }
+      }
+
+      // Fall through to local SpeechSynthesis. Re-check the token: while we
+      // were awaiting Cloud TTS, the user may have pressed stop.
+      if (state.ttsToken !== myToken) return;
+
+      if (!('speechSynthesis' in window)) { onDone(); return; }
+      try {
+        const u = speakLocal(text, cfg.localLang);
+        u.onend = u.onerror = onDone;
+      } catch (e) {
+        console.warn('Local TTS failed:', e.message);
+        onDone();
+      }
+    }
+
+    // Returns an Audio element for the synthesized text; caller is responsible
+    // for assigning state.audioEl and then calling .play(). Doing play() here
+    // would race a stop-click that lands between play() and the caller's
+    // assignment, leaving phantom audio that stopSpeaking() can no longer reach.
+    async function speakCloud(text, langCode, voiceName, signal) {
+      const url = `${CONFIG.TTS_BASE}/text:synthesize?key=${state.ttsApiKey}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: { text },
+          voice: { languageCode: langCode, name: voiceName },
+          audioConfig: { audioEncoding: 'MP3' }
+        }),
+        signal,
+      });
+
+      if (!res.ok) {
+        let errMsg = `Cloud TTS Error: ${res.status}`;
+        try {
+          const body = await res.text();
+          const parsed = JSON.parse(body);
+          errMsg = parsed.error?.message || errMsg;
+          if (parsed.error?.message?.includes('does not exist') && voiceName.includes('Neural2')) {
+            const fallback = voiceName.replace('Neural2', 'Wavenet').replace(/-[A-Z]$/, '-A');
+            return speakCloud(text, langCode, fallback, signal);
+          }
+        } catch (e) {
+          console.warn('Cloud TTS error parse failed:', e.message);
+        }
+        throw new Error(errMsg);
+      }
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+
+      return new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+    }
+
+    function speakLocal(text, localLang) {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = localLang;
+      const voices = speechSynthesis.getVoices();
+      const best = voices.find(v => v.lang === localLang && v.name.includes('Google'))
+                || voices.find(v => v.lang === localLang)
+                || voices.find(v => v.lang.startsWith(localLang.split('-')[0]) && v.name.includes('Google'))
+                || voices.find(v => v.lang.startsWith(localLang.split('-')[0]));
+      if (best) u.voice = best;
+      speechSynthesis.speak(u);
+      return u;
+    }
+
+    function stopSpeaking() {
+      if (state.ttsTimeout) { clearTimeout(state.ttsTimeout); state.ttsTimeout = null; }
+
+      // Bump the token first so any pending Cloud TTS fetch that resolves
+      // after this point is discarded by speak()'s stale-result guard.
+      state.ttsToken++;
+
+      // Abort an in-flight Cloud TTS download.
+      if (state.ttsController) {
+        try { state.ttsController.abort(); } catch {}
+        state.ttsController = null;
+      }
+
+      if (state.audioEl) {
+        state.audioEl.pause();
+        state.audioEl.currentTime = 0;
+        state.audioEl = null;
+      }
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+
+      if (state.speakingPanel != null) {
+        const btn = getPanelBtn(state.speakingPanel);
+        const panel = getPanelEl(state.speakingPanel);
+        btn.textContent = '朗讀';
+        btn.title = '朗讀';
+        btn.setAttribute('aria-label', `Read aloud ${state.speakingPanel === 0 ? 'source text' : 'translation ' + state.speakingPanel}`);
+        btn.classList.remove('speaking');
+        panel.classList.remove('speaking-glow');
+      }
+      state.speaking = false;
+      state.speakingPanel = null;
+      el.stopFab.classList.remove('show');
+    }
+
+    // --- Input events ---
+    el.src.addEventListener('input', () => {
+      el.srcCount.textContent = String(el.src.value.length);
+      autoResizeTextarea();
+      setBusy(state.busy);
+      persistSrcText();
+
+      if (!state.auto) return;
+      // The current in-flight translation/refine was started against an older
+      // source. Abort it now so its remaining stream chunks do not continue
+      // appending under the user's freshly typed source. The debounced
+      // translateAll() that fires next will start a clean job.
+      if (state.controller) {
+        try { state.controller.abort(); } catch {}
+      }
+      if (state.debounce) clearTimeout(state.debounce);
+      if (!el.src.value.trim()) {
+        state.detected = null;
+        setLangChips(null);
+        clearOutputs();
+        return;
+      }
+      // v2: skip auto-translate after pre-edit / file import
+      if (state._skipNextAuto) {
+        state._skipNextAuto = false;
+        return;
+      }
+      state.debounce = setTimeout(() => { translateAll().catch(() => {}); }, CONFIG.DEBOUNCE_MS);
+    });
+
+    el.btnTranslate.addEventListener('click', () => translateAll().catch(() => {}));
+    el.btnCopySrc.addEventListener('click', () => copyText(el.src.value, el.btnCopySrc));
+    el.btnCopy1.addEventListener('click', () => copyText(getOutputText(1), el.btnCopy1));
+    el.btnCopy2.addEventListener('click', () => copyText(getOutputText(2), el.btnCopy2));
+    el.btnCopyRev1.addEventListener('click', () => copyText(el.revOut1.textContent, el.btnCopyRev1));
+    el.btnCopyRev2.addEventListener('click', () => copyText(el.revOut2.textContent, el.btnCopyRev2));
+
+    // --- Clear with Undo ---
+    el.btnClear.addEventListener('click', () => {
+      const srcText = el.src.value;
+      // Use getOutputText so a snapshot taken while diff view is showing
+      // captures the clean refined text, not interleaved add/del fragments.
+      const out1Text = getOutputText(1);
+      const out2Text = getOutputText(2);
+
+      // Nothing to clear
+      if (!srcText.trim() && !out1Text.trim() && !out2Text.trim()) return;
+
+      // Snapshot for undo
+      const snapshot = {
+        src: srcText,
+        out1: out1Text,
+        out2: out2Text,
+        detected: state.detected,
+      };
+
+      abortInFlight();
+      el.src.value = '';
+      el.srcCount.textContent = '0';
+      state.detected = null;
+      setLangChips(null);
+      clearOutputs();
+      autoResizeTextarea();
+      setBusy(false);
+      closeAllReverse();
+      persistSrcText();
+
+      toastUndo('已清除全部內容 ', () => {
+        // Undo: restore snapshot
+        el.src.value = snapshot.src;
+        el.srcCount.textContent = String(snapshot.src.length);
+        el.out1.textContent = snapshot.out1;
+        el.out2.textContent = snapshot.out2;
+        state.detected = snapshot.detected;
+        if (snapshot.detected) setLangChips(snapshot.detected);
+        autoResizeTextarea();
+        setBusy(false);
+        updateOutputCount(1);
+        updateOutputCount(2);
+        persistSrcText();
+      });
+    });
+
+    el.btnRefine1.addEventListener('click', () => manualRefine(1).catch(() => {}));
+    el.btnRefine2.addEventListener('click', () => manualRefine(2).catch(() => {}));
+
+    // --- Reverse translation (inline side-by-side) ---
+    el.btnReverse1.addEventListener('click', () => reverseTranslate(1).catch(() => {}));
+    el.btnReverse2.addEventListener('click', () => reverseTranslate(2).catch(() => {}));
+    el.btnCloseRev1.addEventListener('click', () => closeReverse(1));
+    el.btnCloseRev2.addEventListener('click', () => closeReverse(2));
+
+    function closeReverse(which) {
+      const revCol = which === 1 ? el.rev1 : el.rev2;
+      const revOut = which === 1 ? el.revOut1 : el.revOut2;
+      revCol.style.display = 'none';
+      revOut.textContent = '';
+    }
+
+    function closeAllReverse() {
+      closeReverse(1);
+      closeReverse(2);
+    }
+
+    async function reverseTranslate(which) {
+      const translatedText = getOutputText(which).trim();
+      if (!translatedText) return;
+
+      if (!state.apiKey) {
+        showError('請先在設定輸入 API Key');
+        return;
+      }
+
+      const srcLang = state.detected || resolveSrcLang(el.src.value);
+      const targets = getTargets(srcLang);
+      const tgtLang = targets[which - 1];
+      const reverseTgt = srcLang;
+
+      const revCol = which === 1 ? el.rev1 : el.rev2;
+      const revOut = which === 1 ? el.revOut1 : el.revOut2;
+      const revLang = which === 1 ? el.rev1Lang : el.rev2Lang;
+
+      revCol.style.display = '';
+      revOut.textContent = '';
+      revLang.textContent = `${LANGUAGES[tgtLang].display} → ${LANGUAGES[reverseTgt].display}`;
+
+      // Cancel any previous in-flight reverse for this panel so a rapid second
+      // click does not produce two parallel fetches racing to write revOut.
+      if (state.reverseController[which]) {
+        try { state.reverseController[which].abort(); } catch {}
+      }
+      const controller = new AbortController();
+      state.reverseController[which] = controller;
+      const myJobId = ++state.reverseJobId[which];
+
+      try {
+        const makeBody = (model) => ({
+          model,
+          temperature: CONFIG.TEMP_TRANSLATE,
+          messages: [
+            { role: 'system', content: buildSystemPrompt(reverseTgt) },
+            { role: 'user', content: buildUserPrompt(translatedText, tgtLang, reverseTgt) },
+          ],
+        });
+
+        let lastText = '';
+        for (const model of modelChain(state.model)) {
+          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(makeBody(model)),
+            signal: controller.signal,
+          });
+
+          if (!res.ok) {
+            lastText = await safeReadText(res);
+            if (isInvalidModelError(res.status, lastText)) continue;
+            throw new Error(lastText || `HTTP ${res.status}`);
+          }
+
+          if (model !== state.lastWorkingModel) {
+            state.lastWorkingModel = model;
+            persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+          }
+
+          const json = await res.json();
+          // Stale-write guard: a newer reverseTranslate(which) may have superseded us.
+          if (state.reverseJobId[which] !== myJobId) return;
+          warnFinishReason(json?.choices?.[0]?.finish_reason, `反譯 T${which}`);
+          const result = (json?.choices?.[0]?.message?.content || '').trim();
+          revOut.textContent = result;
+          return;
+        }
+        throw new Error(lastText || 'All models failed');
+      } catch (e) {
+        if (isAbortError(e)) return;
+        showError('反譯失敗：' + String(e?.message || e));
+      } finally {
+        if (state.reverseController[which] === controller) {
+          state.reverseController[which] = null;
+        }
+      }
+    }
+
+    // --- Keyboard shortcuts ---
+    // Single Esc handler with explicit priority: dismiss any visible overlay /
+    // dropdown / tooltip first; only abort in-flight work when nothing else
+    // is open. (Previously two separate listeners both fired on Esc, so closing
+    // a modal also aborted the active translation.)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (el.selectionTooltip.classList.contains('show')) { hideSelectionTooltip(); return; }
+        if (el.preeditDropdown.classList.contains('show')) { togglePreeditMenu(false); return; }
+        if (el.settingsOverlay.classList.contains('show')) { openSettings(false); return; }
+        if (el.glossaryOverlay.classList.contains('show')) { openGlossary(false); return; }
+        if (state.chatOpen) return;
+        abortInFlight();
+        return;
+      }
+      const isCmdEnter = (e.ctrlKey || e.metaKey) && e.key === 'Enter';
+      if (isCmdEnter) {
+        e.preventDefault();
+        if (!state.busy) translateAll().catch(() => {});
+      }
+    });
+
+    // Abort everything that could write user-visible state.
+    // skipPreedit=true is used by runPreedit's own apply path so it doesn't
+    // abort its own controller while applying its successful result.
+    function abortInFlight({ skipPreedit = false } = {}) {
+      state.activeJobId = ++state.jobId;
+      if (state.controller) {
+        try { state.controller.abort(); } catch (e) { console.warn('Abort failed:', e.message); }
+      }
+      state.controller = null;
+      // Pre-edit writes back into el.src.value on completion — a "cancelled"
+      // operation that finishes its fetch will silently overwrite the source.
+      // Same risk for reverse: it writes into revOut.
+      if (!skipPreedit && state.preeditController) {
+        try { state.preeditController.abort(); } catch {}
+        state.preeditController = null;
+      }
+      for (const k of [1, 2]) {
+        if (state.reverseController[k]) {
+          try { state.reverseController[k].abort(); } catch {}
+          state.reverseController[k] = null;
+        }
+      }
+      setBusy(false);
+      setStatus(1, '');
+      setStatus(2, '');
+    }
+
+    // --- Core logic ---
+    function modelChain(primary) {
+      const out = [];
+      const add = (m) => { if (m && !out.includes(m)) out.push(m); };
+      if (state.lastWorkingModel && state.lastWorkingModel !== primary) {
+        add(state.lastWorkingModel);
+      }
+      add(primary);
+      for (const m of MODEL_FALLBACK_CHAIN) add(m);
+      return out;
+    }
+
+    function detectLang(text) {
+      const t = (text || '').trim();
+      if (!t) return 'en';
+      if (/[\u3040-\u30ff]/.test(t)) return 'ja';
+      if (/[々ー]/.test(t)) return 'ja';
+      if (/[\u4e00-\u9fff]/.test(t)) return 'zh-TW';
+      return 'en';
+    }
+
+    function resolveSrcLang(text) {
+      if (state.langOverride !== 'auto') return state.langOverride;
+      return detectLang(text);
+    }
+
+    function getTargets(src) {
+      const lang = LANGUAGES[src];
+      return lang ? lang.targets : ['zh-TW', 'ja'];
+    }
+
+    // Re-run source-language detection from el.src.value and sync state.detected
+    // and the language chips. Used after non-translate paths replace the source
+    // (import / pre-edit / undo), since the input handler skips chip updates
+    // when state._skipNextAuto is set.
+    function refreshSrcLangChips() {
+      const text = (el.src.value || '').trim();
+      if (text) {
+        const srcLang = resolveSrcLang(text);
+        state.detected = srcLang;
+        setLangChips(srcLang);
+      } else {
+        state.detected = null;
+        setLangChips(null);
+      }
+    }
+
+    // --- v2: Glossary / Tone prompt fragments ---
+    function buildGlossaryFragment() {
+      const list = (state.glossary || []).filter(g => g && (g.source || '').trim() && (g.translation || '').trim());
+      if (!list.length) return '';
+      const lines = list.slice(0, 200).map(g => `- ${g.source.trim()} ↔ ${g.translation.trim()}`).join('\n');
+      return `\n[GLOSSARY] Apply these term mappings consistently in either direction (matching is case-insensitive; whole-token preferred):\n${lines}`;
+    }
+
+    function buildToneFragment() {
+      const cfg = TONE_CONFIG[state.tone];
+      if (!cfg || !cfg.prompt) return '';
+      return `\n[TONE] ${cfg.prompt}`;
+    }
+
+    // --- Prompt builders ---
+    function buildSystemPrompt(target) {
+      const lang = LANGUAGES[target];
+      return `You are a professional translator.
+- Output: ${lang.promptName} only.
+- Keep meaning exact; no added or missing information.
+- Preserve: codes, units, numbers, math, tags, tables.
+- Use consistent terminology and a formal-neutral register by default.
+- If there are bullet points or lists, keep them.
+- Do not include explanations—return translation only.${lang.translateExtra}${buildToneFragment()}${buildGlossaryFragment()}`;
+    }
+
+    function buildUserPrompt(text, src, tgt) {
+      return `Translate from ${src} to ${tgt}. Return only the translation.\n\nSOURCE:\n${text}`;
+    }
+
+    function buildRefineSystemPrompt(target) {
+      const lang = LANGUAGES[target];
+      return `You are a senior editor revising an existing translation.
+- Goal: improve naturalness, fluency, and localization for the target audience.
+- Keep all original meaning strictly intact.
+- Do not add or remove information.
+- Preserve codes, numbers, units, technical terms, and formatting.${lang.refineExtra}${buildToneFragment()}${buildGlossaryFragment()}`;
+    }
+
+    function buildRefineUserPrompt(source, draft, src, tgt) {
+      return `You will revise an existing translation.\n\nSource language: ${src}\nTarget language: ${tgt}\n\n1) Read the source.\n2) Read the draft translation.\n3) Rewrite the translation so that it is more natural, fluent, and locally appropriate for the target language.\n4) Keep all information and meaning.\n5) Return ONLY the improved translation.\n\nSOURCE:\n${source}\n\nDRAFT TRANSLATION:\n${draft}`;
+    }
+
+    // --- Translation ---
+    async function translateAll() {
+      const text = (el.src.value || '').trim();
+
+      if (!state.apiKey) {
+        showError('請先在設定輸入 API Key');
+        return;
+      }
+      if (!text) {
+        clearOutputs();
+        state.detected = null;
+        setLangChips(null);
+        return;
+      }
+
+      abortInFlight();
+
+      const controller = new AbortController();
+      state.controller = controller;
+
+      const jobId = ++state.jobId;
+      state.activeJobId = jobId;
+
+      setBusy(true);
+
+      const srcLang = resolveSrcLang(text);
+      state.detected = srcLang;
+      const { t1, t2 } = setLangChips(srcLang);
+
+      const tasks = [];
+      if (!state.hidden[1]) {
+        // clearDiff before updateOutputCount: getOutputText reads state.diff.cleanText
+        // while diff view is showing, so counting before clearing would yield the
+        // stale cleanText length even though textContent was just blanked.
+        el.out1.textContent = ''; setStatus(1, '…'); clearDiff(1); updateOutputCount(1); closeReverse(1);
+        tasks.push(streamTranslate({ which: 1, text, srcLang, tgtLang: t1, controller, jobId }));
+      }
+      if (!state.hidden[2]) {
+        el.out2.textContent = ''; setStatus(2, '…'); clearDiff(2); updateOutputCount(2); closeReverse(2);
+        tasks.push(streamTranslate({ which: 2, text, srcLang, tgtLang: t2, controller, jobId }));
+      }
+
+      if (tasks.length === 0) { setBusy(false); toast('兩個譯文欄位都已隱藏'); return; }
+
+      (async () => {
+        try {
+          await Promise.all(tasks);
+        } catch (e) {
+          if (isAbortError(e)) return;
+
+          const msg = String(e?.message || e || '');
+
+          if (/401|unauthorized|invalid api key/i.test(msg)) {
+            showError('API Key 無效或權限不足');
+          } else if (/429|rate limit|Too Many Requests/i.test(msg)) {
+            showError('rate limit：請稍後再試，或關閉 Auto / Auto Refine');
+          } else if (/invalid_model|model.*not found|no such model|unknown model/i.test(msg)) {
+            showError('模型不可用：已嘗試自動 fallback，仍失敗（可改用 gpt-4o / gpt-4o-mini）');
+          } else {
+            try {
+              const j = JSON.parse(msg);
+              showError(j?.error?.message || msg);
+            } catch {
+              showError(msg);
+            }
+          }
+        } finally {
+          if (state.activeJobId === jobId) {
+            setBusy(false);
+            state.controller = null;
+            setStatus(1, '');
+            setStatus(2, '');
+          }
+        }
+      })();
+    }
+
+    async function manualRefine(which) {
+      const text = (el.src.value || '').trim();
+      if (!text) return;
+
+      const outEl = which === 1 ? el.out1 : el.out2;
+      // Use getOutputText so a refine triggered while diff view is showing
+      // operates on the clean refined text, not on add+del concatenation.
+      const draft = getOutputText(which).trim();
+      if (!draft) {
+        showError('請先翻譯出初稿，再潤稿');
+        return;
+      }
+
+      if (!state.apiKey) {
+        showError('請先在設定輸入 API Key');
+        return;
+      }
+
+      abortInFlight();
+
+      const controller = new AbortController();
+      state.controller = controller;
+
+      const jobId = ++state.jobId;
+      state.activeJobId = jobId;
+
+      const srcLang = state.detected || resolveSrcLang(text);
+      const targets = getTargets(srcLang);
+      const tgtLang = targets[which - 1];
+
+      state.refining[which] = true;
+      setBusy(true);
+      setStatus(which, '潤稿中…');
+
+      const refineBtn = which === 1 ? el.btnRefine1 : el.btnRefine2;
+      refineBtn.classList.add('refining');
+
+      try {
+        const refined = await refineTranslation({
+          source: text,
+          draft,
+          srcLang,
+          tgtLang,
+          mode: 'manual',
+          signal: controller.signal,
+          jobId,
+        });
+
+        if (state.activeJobId !== jobId) return;
+        if (controller.signal.aborted) return;
+
+        // User-edit guard: if the user typed in the panel during refine, do not
+        // overwrite their edits. Compare current panel text against the draft
+        // we sent. (getOutputText is diff-aware; diff button is hidden during
+        // a fresh refine, so this returns the live DOM textContent.)
+        if (getOutputText(which).trim() !== draft) {
+          toast(`潤稿期間 T${which} 譯文已被修改，已保留您的編輯`, 'error', 4000);
+          return;
+        }
+
+        // Store diff data for toggle button, show clean text
+        storeDiff(which, draft, refined);
+        outEl.textContent = refined;
+        updateOutputCount(which);
+      } catch (e) {
+        if (isAbortError(e)) return;
+        const msg = String(e?.message || e || '');
+        try {
+          const j = JSON.parse(msg);
+          showError(j?.error?.message || msg);
+        } catch {
+          showError(msg);
+        }
+      } finally {
+        refineBtn.classList.remove('refining');
+        // Per-panel state must always reset, even when a newer job has
+        // superseded this one — otherwise the refine button stays disabled
+        // forever (state.refining[which] is read by setBusy).
+        state.refining[which] = false;
+        if (state.activeJobId === jobId) {
+          setBusy(false);
+          state.controller = null;
+          setStatus(which, '');
+        } else {
+          // Refresh button-disabled state without touching shared busy/controller
+          // (a newer job owns those now).
+          setBusy(state.busy);
+        }
+      }
+    }
+
+    async function streamTranslate({ which, text, srcLang, tgtLang, controller, jobId }) {
+      const outEl = which === 1 ? el.out1 : el.out2;
+      outEl.textContent = '';
+
+      if (state.activeJobId !== jobId) return;
+      if (controller?.signal?.aborted) return;
+
+      const makeBody = (model) => ({
+        model,
+        stream: true,
+        temperature: CONFIG.TEMP_TRANSLATE,
+        messages: [
+          { role: 'system', content: buildSystemPrompt(tgtLang) },
+          { role: 'user', content: buildUserPrompt(text, srcLang, tgtLang) },
+        ],
+      });
+
+      let res = null;
+      let lastText = '';
+      for (const model of modelChain(state.model)) {
+        res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.apiKey}`,
+          },
+          body: JSON.stringify(makeBody(model)),
+          signal: controller.signal,
+        });
+
+        if (res.ok && res.body) {
+          if (model !== state.lastWorkingModel) {
+            state.lastWorkingModel = model;
+            persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+          }
+          break;
+        }
+
+        lastText = await safeReadText(res);
+        if (!isInvalidModelError(res.status, lastText)) break;
+      }
+
+      if (!res || !res.ok || !res.body) {
+        throw new Error(lastText || `HTTP ${res?.status || 0}`);
+      }
+
+      // Remove skeleton once streaming starts
+      $(getPanel(which).panelId).classList.remove('loading');
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      let buffer = '';
+      let full = '';
+
+      let domBuf = '';
+      let rafId = 0;
+      const flush = () => {
+        rafId = 0;
+        if (state.activeJobId !== jobId) return;
+        if (controller.signal.aborted) return;
+        if (!domBuf) return;
+        outEl.appendChild(document.createTextNode(domBuf));
+        domBuf = '';
+        outEl.scrollTop = outEl.scrollHeight;
+      };
+      const scheduleFlush = () => {
+        if (rafId) return;
+        rafId = requestAnimationFrame(flush);
+      };
+
+      let doneFlag = false;
+      let finishReason = null;
+      let streamParseError = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        while (true) {
+          const nl = buffer.indexOf('\n');
+          if (nl < 0) break;
+
+          const line = buffer.slice(0, nl);
+          buffer = buffer.slice(nl + 1);
+
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+
+          const data = trimmed.slice(5).trim();
+          if (!data) continue;
+
+          if (data === '[DONE]') {
+            doneFlag = true;
+            break;
+          }
+
+          try {
+            const json = JSON.parse(data);
+            const delta = json?.choices?.[0]?.delta?.content || '';
+            const fr = json?.choices?.[0]?.finish_reason;
+            if (fr) finishReason = fr;
+            if (delta) {
+              full += delta;
+              domBuf += delta;
+              scheduleFlush();
+            }
+          } catch {
+            // Record but keep reading — a single corrupt chunk shouldn't kill
+            // the loop, but we will fail strictly after the loop so the user
+            // is not shown a partial-with-gap as a complete translation.
+            streamParseError = true;
+          }
+        }
+
+        if (doneFlag) break;
+      }
+
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      flush();
+      updateOutputCount(which);
+
+      // Aborts already returned; otherwise enforce stream integrity. Either
+      // missing [DONE] or any malformed mid-stream chunk means the output is
+      // potentially incomplete — translation must not be treated as final.
+      if (!controller.signal.aborted && state.activeJobId === jobId) {
+        if (!doneFlag) {
+          throw new Error('翻譯串流提前結束（未收到 [DONE]）');
+        }
+        if (streamParseError) {
+          throw new Error('翻譯串流解析失敗（中段 JSON 異常，輸出可能不完整）');
+        }
+      }
+
+      // Surface non-stop finish_reason (length-truncated, content-filtered, etc.)
+      warnFinishReason(finishReason, `翻譯 T${which}`);
+
+      if (!state.autoRefine) return;
+      if (state.activeJobId !== jobId) return;
+      if (controller.signal.aborted) return;
+
+      setStatus(which, '潤稿中…');
+
+      // Auto-refine failure must not destroy the streamed translation; keep the
+      // draft visible and surface the failure as a status / toast hint instead
+      // of letting the throw propagate to translateAll's outer catch.
+      let refined = full;
+      try {
+        refined = await refineTranslation({
+          source: text,
+          draft: full,
+          srcLang,
+          tgtLang,
+          mode: 'auto',
+          signal: controller.signal,
+          jobId,
+        });
+      } catch (e) {
+        if (isAbortError(e)) throw e;
+        if (state.activeJobId === jobId) {
+          setStatus(which, '⚠ 自動潤稿失敗');
+          toast(`自動潤稿失敗（T${which}），已保留初稿`, 'error', 4000);
+        }
+        return; // keep `full` already in outEl; do not storeDiff (no refinement to compare)
+      }
+
+      if (state.activeJobId !== jobId) return;
+      if (controller.signal.aborted) return;
+
+      // User-edit guard: if the user typed in the panel between stream end and
+      // refine completion, keep their edits and skip the overwrite.
+      if (getOutputText(which).trim() !== full.trim()) {
+        setStatus(which, '');
+        toast(`自動潤稿期間 T${which} 譯文已被修改，已保留您的編輯`, 'error', 4000);
+        return;
+      }
+
+      // Store diff data for toggle button, show clean text
+      storeDiff(which, full, refined);
+      outEl.textContent = refined;
+      updateOutputCount(which);
+    }
+
+    async function refineTranslation({ source, draft, srcLang, tgtLang, mode, signal, jobId }) {
+      const base = (draft || '').trim();
+      if (!base) return base;
+
+      if (jobId && state.activeJobId !== jobId) return base;
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+
+      const temperature = (mode === 'manual') ? CONFIG.TEMP_REFINE_MANUAL : CONFIG.TEMP_REFINE_AUTO;
+      const label = (mode === 'manual') ? '潤稿' : '自動潤稿';
+
+      const makeBody = (model) => ({
+        model,
+        temperature,
+        messages: [
+          { role: 'system', content: buildRefineSystemPrompt(tgtLang) },
+          { role: 'user', content: buildRefineUserPrompt(source, base, srcLang, tgtLang) },
+        ],
+      });
+
+      // Failures must be distinguishable from "model returned unchanged text".
+      // We throw on real failures; callers (manualRefine / streamTranslate auto-refine)
+      // decide whether to surface as error (manual) or quiet status hint (auto).
+      let lastText = '';
+      for (const model of modelChain(state.model)) {
+        const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.apiKey}`,
+          },
+          body: JSON.stringify(makeBody(model)),
+          signal,
+        });
+
+        if (!res.ok) {
+          lastText = await safeReadText(res);
+          if (isInvalidModelError(res.status, lastText)) continue;
+          throw new Error(lastText || `HTTP ${res.status}`);
+        }
+
+        if (model !== state.lastWorkingModel) {
+          state.lastWorkingModel = model;
+          persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+        }
+
+        const json = await res.json();
+        warnFinishReason(json?.choices?.[0]?.finish_reason, label);
+        const refined = (json?.choices?.[0]?.message?.content || '').trim();
+        return refined || base;
+      }
+      throw new Error(lastText || 'All models failed');
+    }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      // Save source text immediately
+      localStorage.setItem(STORAGE_KEYS.SRC_TEXT, el.src.value);
+
+      if (state.controller) {
+        try { state.controller.abort(); } catch {}
+      }
+      if (state.ttsController) { try { state.ttsController.abort(); } catch {} }
+      if (state.audioEl) { state.audioEl.pause(); state.audioEl = null; }
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+      if (state.ttsTimeout) clearTimeout(state.ttsTimeout);
+    });
+
+    // ============================================================
+    // v2: GLOSSARY
+    // ============================================================
+    function persistGlossary() {
+      try { localStorage.setItem(STORAGE_KEYS.GLOSSARY, JSON.stringify(state.glossary)); }
+      catch (e) { console.warn('Glossary persist failed:', e.message); }
+    }
+
+    function renderGlossary() {
+      const tbody = el.glossaryTbody;
+      tbody.innerHTML = '';
+      const list = state.glossary || [];
+      el.glossaryEmpty.style.display = list.length ? 'none' : '';
+      for (const term of list) {
+        const tr = document.createElement('tr');
+        const tdSrc = document.createElement('td');
+        tdSrc.className = 'glossary-cell';
+        tdSrc.textContent = term.source || '';
+        const tdTrans = document.createElement('td');
+        tdTrans.className = 'glossary-cell';
+        tdTrans.textContent = term.translation || '';
+        const tdAct = document.createElement('td');
+        tdAct.className = 'glossary-action';
+        const btnDel = document.createElement('button');
+        btnDel.className = 'icon';
+        btnDel.title = '刪除';
+        btnDel.textContent = '✕';
+        btnDel.addEventListener('click', () => deleteGlossaryTerm(term.id));
+        tdAct.appendChild(btnDel);
+        tr.appendChild(tdSrc);
+        tr.appendChild(tdTrans);
+        tr.appendChild(tdAct);
+        tbody.appendChild(tr);
+      }
+    }
+
+    function addGlossaryTerm(source, translation) {
+      const s = (source || '').trim();
+      const t = (translation || '').trim();
+      if (!s || !t) return false;
+      // Dedup by case-insensitive source+translation pair
+      const exists = state.glossary.some(g =>
+        (g.source || '').toLowerCase() === s.toLowerCase() &&
+        (g.translation || '').toLowerCase() === t.toLowerCase()
+      );
+      if (exists) return false;
+      const id = 'g_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      state.glossary.push({ id, source: s, translation: t });
+      persistGlossary();
+      renderGlossary();
+      return true;
+    }
+
+    function deleteGlossaryTerm(id) {
+      state.glossary = state.glossary.filter(g => g.id !== id);
+      persistGlossary();
+      renderGlossary();
+    }
+
+    function clearGlossary() {
+      if (!state.glossary.length) return;
+      const snapshot = state.glossary.slice();
+      state.glossary = [];
+      persistGlossary();
+      renderGlossary();
+      toastUndo(`已清空 ${snapshot.length} 個字彙 `, () => {
+        state.glossary = snapshot;
+        persistGlossary();
+        renderGlossary();
+      });
+    }
+
+    function csvEscape(s) {
+      const v = String(s ?? '');
+      return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    }
+
+    function exportGlossaryCSV() {
+      const list = state.glossary || [];
+      if (!list.length) { toast('字彙表為空，無法匯出'); return; }
+      const lines = ['source,translation'];
+      for (const g of list) lines.push(`${csvEscape(g.source)},${csvEscape(g.translation)}`);
+      const csv = '﻿' + lines.join('\r\n'); // UTF-8 BOM for Excel
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `glossary_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast(`已匯出 ${list.length} 個字彙`);
+    }
+
+    // Minimal CSV parser supporting quoted fields, CRLF, escaped quotes
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let field = '';
+      let inQ = false;
+      // Strip BOM
+      if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQ) {
+          if (c === '"') {
+            if (text[i + 1] === '"') { field += '"'; i++; }
+            else { inQ = false; }
+          } else field += c;
+        } else {
+          if (c === '"') inQ = true;
+          else if (c === ',' || c === '\t') { row.push(field); field = ''; }
+          else if (c === '\r') { /* swallow; \n will close row */ }
+          else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+          else field += c;
+        }
+      }
+      // last field/row
+      if (field.length || row.length) { row.push(field); rows.push(row); }
+      return rows.filter(r => r.length && r.some(c => (c || '').trim()));
+    }
+
+    function importGlossaryFromText(text) {
+      const rows = parseCSV(text);
+      if (!rows.length) { toastError('檔案為空或格式不符'); return; }
+      // Skip header if first row looks like one
+      const first = rows[0].map(c => (c || '').toLowerCase().trim());
+      const startIdx = (first[0] === 'source' || first[0] === '原文') ? 1 : 0;
+      let added = 0;
+      for (let i = startIdx; i < rows.length; i++) {
+        const r = rows[i];
+        if (r.length >= 2) {
+          if (addGlossaryTerm(r[0], r[1])) added++;
+        }
+      }
+      if (added) toast(`已匯入 ${added} 個字彙`);
+      else toast('沒有新字彙（重複或格式不符）');
+    }
+
+    async function extractGlossaryFromSource() {
+      const text = (el.src.value || '').trim();
+      if (!text) { toast('原文為空'); return; }
+      if (!state.apiKey) { showError('請先在設定輸入 API Key'); return; }
+
+      const srcLang = state.detected || resolveSrcLang(text);
+      const targets = getTargets(srcLang);
+      const tgtLang = targets[0]; // default to t1's lang
+
+      const existingSrcLower = (state.glossary || []).map(g => (g.source || '').toLowerCase());
+      const skipList = existingSrcLower.length ? `\n\nAlready in glossary (skip these source terms): ${existingSrcLower.slice(0, 80).join(', ')}` : '';
+
+      const system = `You are a terminology extractor for a translator.
+- Extract proper nouns, technical terms, brand names, product names, and repeating jargon (5-15 terms max).
+- Source language: ${LANGUAGES[srcLang].promptName}.
+- Target language for translation: ${LANGUAGES[tgtLang].promptName}.
+- For each term, provide its natural counterpart in the target language.
+- Skip generic words, articles, prepositions, common verbs.
+- Return ONLY valid JSON in this exact shape: {"terms": [{"source": "string", "translation": "string"}]}
+- No commentary, no markdown fences.${skipList}`;
+
+      if (state.glossaryController) { try { state.glossaryController.abort(); } catch {} }
+      const controller = new AbortController();
+      state.glossaryController = controller;
+
+      const btn = el.btnExtractGlossary;
+      const orig = btn.textContent;
+        btn.textContent = '抽取中…';
+      btn.disabled = true;
+
+      try {
+        const makeBody = (model) => ({
+          model,
+          temperature: 0.2,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: text },
+          ],
+        });
+
+        let lastText = '';
+        let result = null;
+        for (const model of modelChain(state.model)) {
+          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(makeBody(model)),
+            signal: controller.signal,
+          });
+          if (!res.ok) {
+            lastText = await safeReadText(res);
+            if (isInvalidModelError(res.status, lastText)) continue;
+            throw new Error(lastText || `HTTP ${res.status}`);
+          }
+          const json = await res.json();
+          warnFinishReason(json?.choices?.[0]?.finish_reason, '字彙抽取');
+          const content = (json?.choices?.[0]?.message?.content || '').trim();
+          try {
+            result = JSON.parse(content);
+          } catch {
+            // Strip possible markdown fences and retry
+            const stripped = content.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+            result = JSON.parse(stripped);
+          }
+          break;
+        }
+        if (!result) throw new Error(lastText || 'Extraction failed');
+
+        const terms = Array.isArray(result.terms) ? result.terms : [];
+        if (!terms.length) { toast('未抽取到新字彙'); return; }
+        renderSuggestions(terms);
+      } catch (e) {
+        if (isAbortError(e)) return;
+        showError('抽取失敗：' + String(e?.message || e));
+      } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
+        if (state.glossaryController === controller) state.glossaryController = null;
+      }
+    }
+
+    function renderSuggestions(terms) {
+      const list = el.suggestionList;
+      list.innerHTML = '';
+      el.glossarySuggestions.style.display = '';
+      for (const t of terms) {
+        const s = (t.source || '').trim();
+        const tr = (t.translation || '').trim();
+        if (!s || !tr) continue;
+        const row = document.createElement('div');
+        row.className = 'suggestion-item';
+        const a = document.createElement('div');
+        a.className = 'suggestion-text';
+        a.textContent = s;
+        const b = document.createElement('div');
+        b.className = 'suggestion-text';
+        b.textContent = tr;
+        const btn = document.createElement('button');
+        btn.className = 'icon primary';
+        btn.textContent = '採用';
+        btn.addEventListener('click', () => {
+          if (addGlossaryTerm(s, tr)) {
+            row.remove();
+            if (!list.children.length) el.glossarySuggestions.style.display = 'none';
+          } else {
+            toast('該字彙已存在');
+          }
+        });
+        row.appendChild(a);
+        row.appendChild(b);
+        row.appendChild(btn);
+        list.appendChild(row);
+      }
+      if (!list.children.length) {
+        el.glossarySuggestions.style.display = 'none';
+        toast('未抽取到新字彙');
+      }
+    }
+
+    function dismissSuggestions() {
+      el.suggestionList.innerHTML = '';
+      el.glossarySuggestions.style.display = 'none';
+    }
+
+    function openGlossary(show) {
+      el.glossaryOverlay.classList.toggle('show', !!show);
+      el.glossaryOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
+      if (show) {
+        _focusReturnGlossary = document.activeElement;
+        renderGlossary();
+        el.glossaryNewSource.focus();
+        trapFocusIn(el.glossaryOverlay.querySelector('.modal'));
+      } else {
+        releaseFocusTrap();
+        _restoreFocus(_focusReturnGlossary);
+        _focusReturnGlossary = null;
+      }
+    }
+
+    el.btnGlossary.addEventListener('click', () => openGlossary(true));
+    el.btnCloseGlossary.addEventListener('click', () => openGlossary(false));
+    el.glossaryOverlay.addEventListener('click', (e) => {
+      if (e.target === el.glossaryOverlay) openGlossary(false);
+    });
+    el.btnAddGlossary.addEventListener('click', () => {
+      const ok = addGlossaryTerm(el.glossaryNewSource.value, el.glossaryNewTrans.value);
+      if (ok) {
+        el.glossaryNewSource.value = '';
+        el.glossaryNewTrans.value = '';
+        el.glossaryNewSource.focus();
+      } else {
+        toast('字彙重複或欄位空白');
+      }
+    });
+    [el.glossaryNewSource, el.glossaryNewTrans].forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); el.btnAddGlossary.click(); }
+      });
+    });
+    el.btnExtractGlossary.addEventListener('click', () => extractGlossaryFromSource());
+    el.btnExportGlossary.addEventListener('click', exportGlossaryCSV);
+    el.btnImportGlossary.addEventListener('click', () => el.glossaryFileInput.click());
+    el.glossaryFileInput.addEventListener('change', (e) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (ev) => {
+        try { importGlossaryFromText(String(ev.target.result || '')); }
+        catch (err) { toastError('匯入失敗：' + err.message); }
+      };
+      r.onerror = () => toastError('檔案讀取失敗');
+      r.readAsText(f, 'utf-8');
+      e.target.value = '';
+    });
+    el.btnClearGlossary.addEventListener('click', clearGlossary);
+    el.btnDismissSuggestions.addEventListener('click', dismissSuggestions);
+
+    // ============================================================
+    // v2: TONE
+    // ============================================================
+    function populateToneSelect(select) {
+      if (!select || select.options.length) return;
+      Object.keys(TONE_CONFIG).forEach((tone) => {
+        const opt = document.createElement('option');
+        opt.value = tone;
+        opt.textContent = TONE_SELECT_LABELS[tone] || TONE_CONFIG[tone]?.label || tone;
+        select.appendChild(opt);
+      });
+    }
+
+    function applyTone(tone) {
+      // Migrate removed tones (e.g., humorous) back to neutral
+      if (tone && !TONE_CONFIG.hasOwnProperty(tone)) tone = '';
+      state.tone = tone || '';
+      try { localStorage.setItem(STORAGE_KEYS.TONE, state.tone); } catch {}
+      [el.toneSelect1, el.toneSelect2].forEach((select) => {
+        populateToneSelect(select);
+        if (select) select.value = state.tone;
+      });
+    }
+
+    [el.toneSelect1, el.toneSelect2].forEach((select) => {
+      populateToneSelect(select);
+      select?.addEventListener('change', (e) => {
+        applyTone(e.target.value || '');
+      });
+    });
+
+    // ============================================================
+    // v2: FILE IMPORT
+    // ============================================================
+    const FILE_LIMIT_HARD = 5 * 1024 * 1024;  // 5 MB
+    const FILE_LIMIT_WARN = 1 * 1024 * 1024;  // 1 MB
+    const FILE_ACCEPT_RE = /\.(txt|md|csv)$/i;
+
+    function stripBOM(s) {
+      return s && s.charCodeAt(0) === 0xFEFF ? s.slice(1) : s;
+    }
+
+    function applyImportedText(text, mode /* 'replace' | 'append' */) {
+      const cleaned = stripBOM(text);
+      if (mode === 'append' && el.src.value) {
+        el.src.value = el.src.value + '\n\n' + cleaned;
+      } else {
+        el.src.value = cleaned;
+      }
+      el.srcCount.textContent = String(el.src.value.length);
+      // Source content has changed — old translations / diff / reverse panes are stale.
+      // Abort any in-flight stream and clear outputs so the user is not left looking at
+      // translations that no longer match the source. (The input handler's _skipNextAuto
+      // branch returns before clearOutputs can run, so we clear here explicitly.)
+      abortInFlight();
+      clearOutputs();
+      closeAllReverse();
+      // Update language detection and chips up-front; the input handler's _skipNextAuto
+      // branch returns before doing this and translateAll() is suppressed.
+      refreshSrcLangChips();
+      // Suppress immediate auto-translate (user may still want to edit before translating)
+      state._skipNextAuto = true;
+      // Trigger src input event to update detection / chips / persistence
+      el.src.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    el.btnImport.addEventListener('click', () => el.fileInput.click());
+    el.fileInput.addEventListener('change', (e) => {
+      const f = e.target.files?.[0];
+      e.target.value = '';
+      if (!f) return;
+      if (!FILE_ACCEPT_RE.test(f.name)) { toastError('僅支援 .txt / .md / .csv'); return; }
+      if (f.size > FILE_LIMIT_HARD) {
+        toastError(`檔案過大（${(f.size/1024/1024).toFixed(1)} MB），上限 5 MB`);
+        return;
+      }
+      if (f.size > FILE_LIMIT_WARN) {
+        toast(`大檔載入中（${(f.size/1024/1024).toFixed(1)} MB），可能稍慢…`);
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = String(ev.target.result || '');
+        const hasExisting = !!el.src.value.trim();
+        if (!hasExisting) {
+          applyImportedText(text, 'replace');
+          toast(`已匯入：${f.name}`);
+          return;
+        }
+        // Existing src — ask user
+        promptImportMode(f.name, () => applyImportedText(text, 'replace'),
+                                  () => applyImportedText(text, 'append'));
+      };
+      reader.onerror = () => toastError('檔案讀取失敗');
+      reader.readAsText(f, 'utf-8');
+    });
+
+    // Custom 3-option toast: 覆蓋 / 附加 / 取消
+    function promptImportMode(filename, onReplace, onAppend) {
+      // Trusted-HTML toast (action links). filename is the only external input;
+      // it is escapeHTML'd before being spliced into the markup.
+      const t = toastHTML(
+        `已有原文，匯入「${escapeHTML(filename)}」<br>` +
+        `<span style="margin-top:6px;display:inline-block">` +
+        `<a class="undo-link" data-act="replace">覆蓋</a>` +
+        `<span style="opacity:0.4;padding:0 6px">·</span>` +
+        `<a class="undo-link" data-act="append">附加</a>` +
+        `<span style="opacity:0.4;padding:0 6px">·</span>` +
+        `<a class="undo-link" data-act="cancel">取消</a>` +
+        `</span>`,
+        'undo',
+        12000
+      );
+      if (!t) return;
+      t.item.querySelectorAll('a.undo-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const act = a.dataset.act;
+          clearTimeout(t.timer);
+          t.dismiss();
+          if (act === 'replace') {
+            const snapshot = el.src.value;
+            onReplace();
+            toastUndo('已覆蓋原文 ', () => {
+              el.src.value = snapshot;
+              el.srcCount.textContent = String(snapshot.length);
+              refreshSrcLangChips();
+              state._skipNextAuto = true;
+              el.src.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+          } else if (act === 'append') {
+            onAppend();
+            toast('已附加');
+          }
+        });
+      });
+    }
+
+    // ============================================================
+    // v2: PRE-EDIT
+    // ============================================================
+    function togglePreeditMenu(show) {
+      const want = (typeof show === 'boolean') ? show : !el.preeditDropdown.classList.contains('show');
+      if (want) positionPreeditDropdown();
+      el.preeditDropdown.classList.toggle('show', want);
+    }
+
+    function positionPreeditDropdown() {
+      const rect = el.btnPreedit.getBoundingClientRect();
+      const dd = el.preeditDropdown;
+      // Render off-screen first to measure
+      dd.style.visibility = 'hidden';
+      dd.style.display = 'block';
+      const w = dd.offsetWidth;
+      const h = dd.offsetHeight;
+      dd.style.display = '';
+      dd.style.visibility = '';
+      // Place below button by default; flip up if not enough space
+      let top = rect.bottom + 6;
+      if (top + h > window.innerHeight - 8) top = Math.max(8, rect.top - h - 6);
+      let left = rect.left;
+      if (left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
+      dd.style.top = top + 'px';
+      dd.style.left = left + 'px';
+    }
+
+    window.addEventListener('resize', () => {
+      if (el.preeditDropdown.classList.contains('show')) positionPreeditDropdown();
+    });
+    window.addEventListener('scroll', () => {
+      if (el.preeditDropdown.classList.contains('show')) positionPreeditDropdown();
+    }, true);
+
+    el.btnPreedit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePreeditMenu();
+    });
+    document.addEventListener('click', (e) => {
+      if (!el.preeditDropdown.classList.contains('show')) return;
+      if (e.target.closest('.preedit-wrap')) return;
+      togglePreeditMenu(false);
+    });
+
+    el.preeditDropdown.addEventListener('click', (e) => {
+      const item = e.target.closest('.preedit-item');
+      if (!item) return;
+      const mode = item.dataset.mode;
+      togglePreeditMenu(false);
+      runPreedit(mode).catch(() => {});
+    });
+
+    async function runPreedit(mode) {
+      const cfg = PREEDIT_CONFIG[mode];
+      if (!cfg) return;
+      const text = (el.src.value || '').trim();
+      if (!text) { toast('原文為空'); return; }
+      if (!state.apiKey) { showError('請先在設定輸入 API Key'); return; }
+      if (state.preediting) return;
+
+      const snapshot = el.src.value;
+      state.preediting = true;
+      el.srcPanel.classList.add('preediting');
+      const orig = el.btnPreedit.textContent;
+      el.btnPreedit.textContent = `${cfg.label}…`;
+      el.btnPreedit.disabled = true;
+
+      if (state.preeditController) { try { state.preeditController.abort(); } catch {} }
+      const controller = new AbortController();
+      state.preeditController = controller;
+
+      try {
+        const makeBody = (model) => ({
+          model,
+          temperature: 0.3,
+          messages: [
+            { role: 'system', content: cfg.system },
+            { role: 'user', content: text },
+          ],
+        });
+
+        let lastText = '';
+        let result = null;
+        for (const model of modelChain(state.model)) {
+          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(makeBody(model)),
+            signal: controller.signal,
+          });
+          if (!res.ok) {
+            lastText = await safeReadText(res);
+            if (isInvalidModelError(res.status, lastText)) continue;
+            throw new Error(lastText || `HTTP ${res.status}`);
+          }
+          const json = await res.json();
+        warnFinishReason(json?.choices?.[0]?.finish_reason, `原文編修（${cfg.label}）`);
+          result = (json?.choices?.[0]?.message?.content || '').trim();
+          break;
+        }
+        if (!result) throw new Error(lastText || 'Pre-edit failed');
+
+        // User-edit guard: if the user typed in the source while pre-edit was
+        // running, do not overwrite their edits. Skip apply silently with a toast.
+        if (el.src.value !== snapshot) {
+          toast(`原文編修（${cfg.label}）期間原文已被修改，已保留您的編輯`, 'error', 4000);
+          return;
+        }
+
+        // Apply — source has been replaced, so old translations / diff / reverse panes
+        // are stale. Abort any in-flight translation and clear outputs explicitly,
+        // since the src input handler's _skipNextAuto branch returns before clearing.
+        // skipPreedit: this very call is the running pre-edit; don't self-abort
+        // the controller we own — let our own finally clean it up after we return.
+        el.src.value = result;
+        el.srcCount.textContent = String(result.length);
+        abortInFlight({ skipPreedit: true });
+        clearOutputs();
+        closeAllReverse();
+        refreshSrcLangChips();
+        state._skipNextAuto = true;
+        el.src.dispatchEvent(new Event('input', { bubbles: true }));
+
+        toastUndo(`已套用「${cfg.label}」 `, () => {
+          el.src.value = snapshot;
+          el.srcCount.textContent = String(snapshot.length);
+          // Outputs were cleared on apply; restoring the source does not bring them back.
+          // The user will re-translate. Keep state consistent: clear any leftover state.
+          abortInFlight();
+          clearOutputs();
+          closeAllReverse();
+          refreshSrcLangChips();
+          state._skipNextAuto = true;
+          el.src.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      } catch (e) {
+        if (!isAbortError(e)) {
+        showError(`原文編修（${cfg.label}）失敗：` + String(e?.message || e));
+        }
+      } finally {
+        state.preediting = false;
+        el.srcPanel.classList.remove('preediting');
+        el.btnPreedit.textContent = orig;
+        el.btnPreedit.disabled = false;
+        if (state.preeditController === controller) state.preeditController = null;
+      }
+    }
+
+    // ============================================================
+    // v2 PHASE 3: CHAT SIDEBAR
+    // ============================================================
+    // Minimal markdown renderer for assistant chat messages.
+    // Supports: fenced code blocks, inline code, **bold**, *italic*,
+    // # headings, - / 1. lists, > blockquotes, [text](url),
+    // --- HR, bare URL auto-link. HTML is always escaped.
+    function escapeMd(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderMarkdown(text) {
+      if (!text) return '';
+      // Defensive: strip any sentinel patterns the source might already contain
+      text = text.replace(/§§(CB|IC)\d+§§/g, '');
+
+      // 1. Extract complete fenced code blocks (preserve internal whitespace).
+      const codeBlocks = [];
+      text = text.replace(/```([a-zA-Z0-9_+\-.]*)\n?([\s\S]*?)```/g, function (_m, lang, code) {
+        const i = codeBlocks.push({ lang: lang || '', code: code || '' }) - 1;
+        return '\n§§CB' + i + '§§\n';
+      });
+      // 2. Handle a trailing UNCLOSED fence (during streaming).
+      text = text.replace(/```([a-zA-Z0-9_+\-.]*)\n?([\s\S]*)$/, function (m, lang, code) {
+        if (!m.startsWith('```')) return m;
+        const i = codeBlocks.push({ lang: lang || '', code: code || '' }) - 1;
+        return '\n§§CB' + i + '§§\n';
+      });
+
+      function inline(s) {
+        s = escapeMd(s);
+        // Inline code first so its contents are not parsed
+        const ics = [];
+        s = s.replace(/`([^`\n]+)`/g, function (_m, c) {
+          return '§§IC' + (ics.push(c) - 1) + '§§';
+        });
+        // Bold **text**
+        s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+        // Italic *text*  (avoid the ** patterns we just consumed)
+        s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+        // Markdown links [text](url)
+        s = s.replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, function (_m, t, u) {
+          const safe = /^(https?:|mailto:)/i.test(u) ? u : '#';
+          return '<a href="' + safe + '" target="_blank" rel="noopener noreferrer">' + t + '</a>';
+        });
+        // Bare URL auto-link
+        s = s.replace(/(^|[^"'>(])(https?:\/\/[^\s<>"]+)/g, function (_m, lead, u) {
+          return lead + '<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + '</a>';
+        });
+        // Restore inline code
+        s = s.replace(/§§IC(\d+)§§/g, function (_m, k) {
+          return '<code>' + escapeMd(ics[+k]) + '</code>';
+        });
+        return s;
+      }
+
+      const lines = text.split('\n');
+      const out = [];
+      let i = 0;
+      while (i < lines.length) {
+        const trimmed = lines[i].trim();
+
+        // Code block placeholder
+        const cm = trimmed.match(/^§§CB(\d+)§§$/);
+        if (cm) { out.push('§§BLK' + cm[1] + '§§'); i++; continue; }
+
+        if (!trimmed) { i++; continue; }
+
+        // Heading
+        const h = trimmed.match(/^(#{1,3})\s+(.+)$/);
+        if (h) {
+          out.push('<h' + h[1].length + '>' + inline(h[2]) + '</h' + h[1].length + '>');
+          i++; continue;
+        }
+
+        // Horizontal rule
+        if (/^---+$/.test(trimmed)) { out.push('<hr>'); i++; continue; }
+
+        // Lists (gather consecutive)
+        const isUL = /^[-*+]\s+(.+)$/.test(trimmed);
+        const isOL = /^\d+\.\s+(.+)$/.test(trimmed);
+        if (isUL || isOL) {
+          const tag = isUL ? 'ul' : 'ol';
+          const items = [];
+          while (i < lines.length) {
+            const ln = lines[i].trim();
+            const mm = tag === 'ul'
+              ? ln.match(/^[-*+]\s+(.+)$/)
+              : ln.match(/^\d+\.\s+(.+)$/);
+            if (!mm) break;
+            items.push('<li>' + inline(mm[1]) + '</li>');
+            i++;
+          }
+          out.push('<' + tag + '>' + items.join('') + '</' + tag + '>');
+          continue;
+        }
+
+        // Blockquote
+        if (trimmed.startsWith('>')) {
+          const buf = [];
+          while (i < lines.length && lines[i].trim().startsWith('>')) {
+            buf.push(inline(lines[i].trim().replace(/^>\s?/, '')));
+            i++;
+          }
+          out.push('<blockquote>' + buf.join('<br>') + '</blockquote>');
+          continue;
+        }
+
+        // Paragraph (consume contiguous non-empty, non-block lines)
+        const para = [];
+        while (i < lines.length) {
+          const ln = lines[i].trim();
+          if (!ln) break;
+          if (/^(#{1,3}\s|---+$|>|[-*+]\s|\d+\.\s|§§CB\d+§§$)/.test(ln)) break;
+          para.push(inline(ln));
+          i++;
+        }
+        if (para.length) out.push('<p>' + para.join('<br>') + '</p>');
+      }
+
+      // Re-insert code blocks
+      let html = out.join('\n');
+      html = html.replace(/§§BLK(\d+)§§/g, function (_m, k) {
+        const cb = codeBlocks[+k];
+        const langAttr = cb.lang ? ' data-lang="' + escapeMd(cb.lang) + '"' : '';
+        return '<pre' + langAttr + '><code>' + escapeMd(cb.code) + '</code></pre>';
+      });
+      return html;
+    }
+
+    function persistChat() {
+      try {
+        const trimmed = state.chatHistory.slice(-CHAT_HISTORY_LIMIT);
+        state.chatHistory = trimmed;
+        localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(trimmed));
+      } catch (e) { console.warn('Chat persist failed:', e.message); }
+    }
+
+    function paintChatMsg(div, role, content) {
+      if (role === 'assistant') {
+        div.innerHTML = renderMarkdown(content || '');
+      } else {
+        div.textContent = content || '';
+      }
+    }
+
+    function renderChatList() {
+      const list = el.chatList;
+      list.innerHTML = '';
+      for (const m of state.chatHistory) {
+        const div = document.createElement('div');
+        div.className = `chat-msg ${m.role === 'user' ? 'user' : 'assistant'}`;
+        paintChatMsg(div, m.role, m.content);
+        list.appendChild(div);
+      }
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function appendChatMessage(role, content) {
+      const msg = { role, content: content || '', ts: Date.now() };
+      state.chatHistory.push(msg);
+      const div = document.createElement('div');
+      div.className = `chat-msg ${role === 'user' ? 'user' : 'assistant'}`;
+      paintChatMsg(div, role, msg.content);
+      el.chatList.appendChild(div);
+      el.chatList.scrollTop = el.chatList.scrollHeight;
+      persistChat();
+      return { msg, node: div };
+    }
+
+    function clearChat() {
+      if (!state.chatHistory.length) { toast('歷史已空'); return; }
+      const snapshot = state.chatHistory.slice();
+      state.chatHistory = [];
+      persistChat();
+      renderChatList();
+      toastUndo(`已清除 ${snapshot.length} 則訊息 `, () => {
+        state.chatHistory = snapshot;
+        persistChat();
+        renderChatList();
+      });
+    }
+
+    function openChat(show) {
+      const want = (typeof show === 'boolean') ? show : true;
+      const wasOpen = state.chatOpen;
+      state.chatOpen = want;
+      el.chatSidebar.classList.toggle('show', want);
+      document.body.classList.toggle('chat-open', want);
+      el.chatScrim.classList.remove('show');
+      if (want) {
+        if (!wasOpen) _focusReturnChat = document.activeElement;
+        renderChatList();
+        // Defer focus until transition starts
+        setTimeout(() => el.chatInput.focus(), 60);
+      } else if (wasOpen) {
+        _restoreFocus(_focusReturnChat);
+        _focusReturnChat = null;
+      }
+    }
+
+    function buildChatSystemPrompt() {
+      const parts = [
+        'You are a translator\'s bilingual assistant.',
+        'Reply in Traditional Chinese (Taiwan, zh-TW) by default. Switch language only when the user explicitly writes in another language (English / Japanese).',
+        'Be concise, structured, and aware that the user is translating between EN, ZH-TW, and JA.',
+        'When asked to explain a term or phrase, give: 1) literal meaning, 2) typical usage / register, 3) a Taiwan-Chinese equivalent if helpful.',
+        'Do not add disclaimers; do not refuse without reason.',
+      ];
+      const gloss = buildGlossaryFragment();
+      if (gloss) parts.push(gloss.trim());
+      // Provide brief context of current source/translations (truncated)
+      const ctxSrc = (el.src.value || '').slice(0, 1200);
+      // Use getOutputText so the chat sees clean refined text, not interleaved
+      // add/del fragments when the user has the diff view toggled on.
+      const ctxT1 = (getOutputText(1) || '').slice(0, 800);
+      const ctxT2 = (getOutputText(2) || '').slice(0, 800);
+      const ctx = [];
+      if (ctxSrc.trim()) ctx.push(`SOURCE (${state.detected || 'unknown'}):\n${ctxSrc}`);
+      if (ctxT1.trim()) ctx.push(`TARGET 1 (${el.t1Lang.textContent}):\n${ctxT1}`);
+      if (ctxT2.trim()) ctx.push(`TARGET 2 (${el.t2Lang.textContent}):\n${ctxT2}`);
+      if (ctx.length) parts.push('\n[CURRENT TRANSLATION CONTEXT]\n' + ctx.join('\n\n'));
+      return parts.join('\n');
+    }
+
+    async function sendChat(text) {
+      const input = (text || '').trim();
+      if (!input || state.chatBusy) return;
+      if (!state.apiKey) { showError('請先在設定輸入 API Key'); return; }
+
+      // Clear input + push user msg
+      el.chatInput.value = '';
+      autoSizeChatInput();
+      appendChatMessage('user', input);
+
+      // Setup assistant streaming msg
+      const aMsg = { role: 'assistant', content: '', ts: Date.now() };
+      state.chatHistory.push(aMsg);
+      const aNode = document.createElement('div');
+      aNode.className = 'chat-msg assistant streaming';
+      aNode.textContent = '';
+      el.chatList.appendChild(aNode);
+      el.chatList.scrollTop = el.chatList.scrollHeight;
+
+      state.chatBusy = true;
+      el.btnSendChat.disabled = true;
+      el.btnSendChat.textContent = '送出中';
+
+      if (state.chatController) { try { state.chatController.abort(); } catch {} }
+      const controller = new AbortController();
+      state.chatController = controller;
+
+      // Build messages: system + last N (already includes the user msg we just pushed)
+      const recent = state.chatHistory
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .filter(m => m !== aMsg)              // exclude empty in-flight assistant
+        .slice(-CHAT_API_WINDOW);
+      const messages = [
+        { role: 'system', content: buildChatSystemPrompt() },
+        ...recent.map(m => ({ role: m.role, content: m.content })),
+      ];
+
+      try {
+        const makeBody = (model) => ({
+          model,
+          stream: true,
+          temperature: 0.4,
+          messages,
+        });
+
+        let res = null;
+        let lastText = '';
+        for (const model of modelChain(state.model)) {
+          res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(makeBody(model)),
+            signal: controller.signal,
+          });
+          if (res.ok && res.body) {
+            if (model !== state.lastWorkingModel) {
+              state.lastWorkingModel = model;
+              persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+            }
+            break;
+          }
+          lastText = await safeReadText(res);
+          if (!isInvalidModelError(res.status, lastText)) break;
+        }
+        if (!res || !res.ok || !res.body) {
+          throw new Error(lastText || `HTTP ${res?.status || 0}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let doneFlag = false;
+        let finishReason = null;
+        let streamParseError = false;
+        let domBuf = '';
+        let rafId = 0;
+        let lastMarkdownRender = 0;
+        const MARKDOWN_THROTTLE_MS = 250;
+
+        const flush = () => {
+          rafId = 0;
+          if (controller.signal.aborted) return;
+          if (!domBuf) return;
+          aMsg.content += domBuf;
+          domBuf = '';
+          // Throttle markdown re-render — renderMarkdown is O(N) over the full
+          // accumulated content, so re-running it on every RAF makes a long
+          // streaming reply quadratic. The final render after the loop ends
+          // (below) catches up any content the throttle skipped.
+          const now = performance.now();
+          if (now - lastMarkdownRender >= MARKDOWN_THROTTLE_MS) {
+            aNode.innerHTML = renderMarkdown(aMsg.content);
+            lastMarkdownRender = now;
+          }
+          el.chatList.scrollTop = el.chatList.scrollHeight;
+        };
+        const scheduleFlush = () => {
+          if (rafId) return;
+          rafId = requestAnimationFrame(flush);
+        };
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          while (true) {
+            const nl = buffer.indexOf('\n');
+            if (nl < 0) break;
+            const line = buffer.slice(0, nl);
+            buffer = buffer.slice(nl + 1);
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            const data = trimmed.slice(5).trim();
+            if (!data) continue;
+            if (data === '[DONE]') { doneFlag = true; break; }
+            try {
+              const json = JSON.parse(data);
+              const delta = json?.choices?.[0]?.delta?.content || '';
+              const fr = json?.choices?.[0]?.finish_reason;
+              if (fr) finishReason = fr;
+              if (delta) { domBuf += delta; scheduleFlush(); }
+            } catch {
+              // Record but keep reading — surfaced after the loop so a malformed
+              // mid-stream chunk is never silently dropped.
+              streamParseError = true;
+            }
+          }
+          if (doneFlag) break;
+        }
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        flush();
+
+        // Surface stream anomalies. Preserve any partial content already shown
+        // and append a marker so the user knows the message is not complete.
+        // Skip on abort (handled by the catch below).
+        if (!controller.signal.aborted) {
+          const issues = [];
+          if (!doneFlag) issues.push('[串流中斷]');
+          if (streamParseError) issues.push('[串流解析錯誤]');
+          if (issues.length) {
+            if (aMsg.content.trim()) {
+              aMsg.content = aMsg.content + '\n\n' + issues.join(' ');
+            } else {
+              throw new Error('Chat 串流異常：' + issues.join(' '));
+            }
+          }
+        }
+
+        warnFinishReason(finishReason, '助手');
+
+        if (!aMsg.content.trim()) {
+          aMsg.content = '（空回覆）';
+        }
+        aNode.innerHTML = renderMarkdown(aMsg.content);
+      } catch (e) {
+        if (isAbortError(e)) {
+          aMsg.content = (aMsg.content || '') + '\n\n[已中斷]';
+        } else {
+          aMsg.content = '錯誤：' + String(e?.message || e);
+        }
+        aNode.innerHTML = renderMarkdown(aMsg.content);
+      } finally {
+        aNode.classList.remove('streaming');
+        persistChat();
+        state.chatBusy = false;
+        el.btnSendChat.disabled = false;
+        el.btnSendChat.textContent = '送出';
+        if (state.chatController === controller) state.chatController = null;
+      }
+    }
+
+    function autoSizeChatInput() {
+      const ta = el.chatInput;
+      ta.style.height = 'auto';
+      ta.style.height = Math.min(140, ta.scrollHeight) + 'px';
+    }
+
+    function prefillChatAndOpen(text) {
+      openChat(true);
+      el.chatInput.value = text;
+      autoSizeChatInput();
+      // Place caret at end
+      el.chatInput.focus();
+      el.chatInput.setSelectionRange(text.length, text.length);
+    }
+
+    // Chat event handlers
+    el.btnChat.addEventListener('click', () => openChat(true));
+    el.btnCloseChat.addEventListener('click', () => openChat(false));
+    el.btnClearChat.addEventListener('click', clearChat);
+    el.chatScrim.addEventListener('click', () => {});
+    el.btnSendChat.addEventListener('click', () => sendChat(el.chatInput.value).catch(() => {}));
+    el.chatInput.addEventListener('input', autoSizeChatInput);
+    el.chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        sendChat(el.chatInput.value).catch(() => {});
+      }
+    });
+
+    // ============================================================
+    // v2 PHASE 3: SELECTION TOOLTIP (Ask AI)
+    // ============================================================
+    function hideSelectionTooltip() {
+      el.selectionTooltip.classList.remove('show');
+      state._selection = null;
+    }
+
+    function showSelectionTooltipAt(x, y, text, source) {
+      state._selection = { text, source };
+      const tip = el.selectionTooltip;
+      tip.style.left = x + 'px';
+      tip.style.top = Math.max(36, y) + 'px';
+      tip.classList.add('show');
+    }
+
+    // Helper: get selection rect for textarea via mirror element
+    function rectForTextareaSelection(ta) {
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      if (start === end) return null;
+      // Build a mirror div to measure caret position; simpler approach: use the bounding rect of the textarea itself
+      // For tooltip purposes, use the mouse position; this fn is a fallback if mouse pos is unknown
+      const r = ta.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + 30 };
+    }
+
+    function getSelectedTextFromTarget(t) {
+      // For <textarea>
+      if (t === el.src) {
+        const s = t.selectionStart, e = t.selectionEnd;
+        if (s === e) return '';
+        return t.value.substring(s, e).trim();
+      }
+      // For contenteditable
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed) return '';
+      const txt = sel.toString().trim();
+      // Ensure selection is inside the target
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        if (!t.contains(range.commonAncestorContainer)) return '';
+      }
+      return txt;
+    }
+
+    function handleSelectionForElement(target, sourceLabel) {
+      target.addEventListener('mouseup', (e) => {
+        // Defer slightly so selection is settled
+        setTimeout(() => {
+          const txt = getSelectedTextFromTarget(target);
+          if (!txt) { hideSelectionTooltip(); return; }
+          showSelectionTooltipAt(e.clientX, e.clientY, txt, sourceLabel);
+        }, 10);
+      });
+      // Hide tooltip when starting a new selection
+      target.addEventListener('mousedown', () => hideSelectionTooltip());
+    }
+
+    handleSelectionForElement(el.src, 'src');
+    handleSelectionForElement(el.out1, 'out1');
+    handleSelectionForElement(el.out2, 'out2');
+
+    // Hide tooltip on any mousedown that is not in the tooltip itself.
+    // (The per-target mousedown handlers above also hide it when the user
+    // starts a new selection inside src/out1/out2 — this listener catches
+    // clicks on toolbar / body / anywhere else so the tooltip does not linger.)
+    document.addEventListener('mousedown', (e) => {
+      if (!el.selectionTooltip.classList.contains('show')) return;
+      if (e.target.closest('.selection-tooltip')) return;
+      hideSelectionTooltip();
+    });
+
+    el.btnAskAI.addEventListener('click', () => {
+      const sel = state._selection;
+      hideSelectionTooltip();
+      if (!sel || !sel.text) return;
+      const prompt = `請解釋：「${sel.text}」`;
+      openChat(true);
+      el.chatInput.value = prompt;
+      autoSizeChatInput();
+      sendChat(prompt).catch(() => {});
+    });
+
+    // ============================================================
+    // v2: Init applied state
+    // ============================================================
+    applyTone(state.tone);
+    renderGlossary();
+    autoSizeChatInput();
+
+    // (Esc handling consolidated into the single keyboard-shortcuts listener above.)
+
+    // Initial paint
+    (function init() {
+      el.srcCount.textContent = String(el.src.value.length);
+      setLangChips(null);
+      setBusy(false);
+      autoResizeTextarea();
+
+      // lightweight self-tests
+      try {
+        console.assert(detectLang('Hello') === 'en', 'detectLang en');
+        console.assert(detectLang('中文') === 'zh-TW', 'detectLang zh-TW');
+        console.assert(detectLang('かな') === 'ja', 'detectLang ja');
+        console.assert(detectLang('。，、') === 'en', 'detectLang: CJK punctuation alone should not match ja');
+        const t = getTargets('en');
+        console.assert(t[0] === 'zh-TW' && t[1] === 'ja', 'getTargets en');
+      } catch (e) {
+        console.warn('Self-test failed:', e);
+      }
+    })();
+  </script>
+
+
+</div></body></html>
