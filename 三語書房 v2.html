@@ -2615,16 +2615,20 @@
       return /failed to fetch|load failed|networkerror|err_failed/i.test(msg);
     }
 
+    function maskApiKeys(str) {
+      return String(str || '').replace(/sk-[A-Za-z0-9_-]{8,}/g, 'sk-***');
+    }
+
     function formatApiError(e) {
       const msg = String(e?.message || e || '');
       if (isApiNetworkError(e)) {
-        return '無法連線到 OpenAI API。請確認填入的是 OpenAI API Key（不是 Gemini Key），並檢查手機網路後再試。';
+        return '無法連線到 OpenAI API。可能是網路問題，或 API Key 類型不對（需 OpenAI Key，非 Gemini）。';
       }
       try {
         const j = JSON.parse(msg);
-        return j?.error?.message || msg;
+        return maskApiKeys(j?.error?.message || msg);
       } catch {
-        return msg;
+        return maskApiKeys(msg);
       }
     }
 
