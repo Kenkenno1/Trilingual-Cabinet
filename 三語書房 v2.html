@@ -2610,6 +2610,24 @@
       toastError(msg);
     }
 
+    function isApiNetworkError(e) {
+      const msg = String(e?.message || e || '');
+      return /failed to fetch|load failed|networkerror|err_failed/i.test(msg);
+    }
+
+    function formatApiError(e) {
+      const msg = String(e?.message || e || '');
+      if (isApiNetworkError(e)) {
+        return '無法連線到 OpenAI API。請確認填入的是 OpenAI API Key（不是 Gemini Key），並檢查手機網路後再試。';
+      }
+      try {
+        const j = JSON.parse(msg);
+        return j?.error?.message || msg;
+      } catch {
+        return msg;
+      }
+    }
+
     function showTruncationWarning(label) {
       showError(`${label}可能被截斷，請檢查結果是否完整。`);
     }
@@ -3394,7 +3412,7 @@
         throw new Error(lastText || 'All models failed');
       } catch (e) {
         if (isAbortError(e)) return;
-        showError('反譯失敗：' + String(e?.message || e));
+        showError('反譯失敗：' + formatApiError(e));
       }
     }
 
@@ -3609,7 +3627,7 @@
           refreshSourceAfterEdit(prevSrc);
         });
       } catch (e) {
-        if (!isAbortError(e)) showError(`${label}失敗：` + String(e?.message || e));
+        if (!isAbortError(e)) showError(`${label}失敗：` + formatApiError(e));
       } finally {
         state.preEditing = false;
         state.preEditController = null;
@@ -3675,12 +3693,7 @@
           } else if (/invalid_model|model.*not found|no such model|unknown model/i.test(msg)) {
             showError('模型不可用：已嘗試 gpt-5.4 / gpt-5.4-mini，仍失敗');
           } else {
-            try {
-              const j = JSON.parse(msg);
-              showError(j?.error?.message || msg);
-            } catch {
-              showError(msg);
-            }
+            showError(formatApiError(e));
           }
         } finally {
           if (state.activeJobId === jobId) {
@@ -3745,13 +3758,7 @@
         updateOutputCount(which);
       } catch (e) {
         if (isAbortError(e)) return;
-        const msg = String(e?.message || e || '');
-        try {
-          const j = JSON.parse(msg);
-          showError(j?.error?.message || msg);
-        } catch {
-          showError(msg);
-        }
+        showError(formatApiError(e));
       } finally {
         refineBtn.classList.remove('refining');
         if (state.activeJobId === jobId) {
@@ -4514,7 +4521,7 @@
         throw new Error(lastText || 'All models failed');
       } catch (e){
         if (e?.name === 'AbortError'){ state.chatHistory.pop(); renderChat(); return; }
-        placeholder.content = '⚠ 錯誤：' + (e?.message || e);
+        placeholder.content = '⚠ 錯誤：' + formatApiError(e);
         placeholder.streaming = false;
         renderChat();
       } finally {
