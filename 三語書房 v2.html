@@ -2480,10 +2480,13 @@
     el.out2.addEventListener('paste', forcePlainPaste);
 
     // ContentEditable: update char count on input
-    el.out1.addEventListener('input', () => updateOutputCount(1));
-    el.out1.addEventListener('input', hideSelectionTooltip);
-    el.out2.addEventListener('input', () => updateOutputCount(2));
-    el.out2.addEventListener('input', hideSelectionTooltip);
+    function handleOutputInput(which) {
+      updateOutputCount(which);
+      if (state.diff[which] && !state.diffShowing[which]) clearDiff(which);
+      hideSelectionTooltip();
+    }
+    el.out1.addEventListener('input', () => handleOutputInput(1));
+    el.out2.addEventListener('input', () => handleOutputInput(2));
 
     // Preload browser voices
     if ('speechSynthesis' in window) speechSynthesis.getVoices();
@@ -2540,6 +2543,10 @@
     function showError(msg) {
       if (!msg) return;
       toastError(msg);
+    }
+
+    function showTruncationWarning(label) {
+      showError(`${label}可能被截斷，請檢查結果是否完整。`);
     }
 
     function updatePreEditControls() {
@@ -2625,6 +2632,8 @@
     function clearDiff(which) {
       state.diff[which] = null;
       state.diffShowing[which] = false;
+      const outEl = which === 1 ? el.out1 : el.out2;
+      outEl.contentEditable = 'true';
       const btn = which === 1 ? el.btnDiff1 : el.btnDiff2;
       btn.style.display = 'none';
       btn.classList.remove('diff-active');
@@ -2841,6 +2850,7 @@
 
     function openSettings(show) {
       if (show) {
+        if (el.glossaryOverlay?.classList.contains('show')) openGlossary(false);
         el.settingsOverlay.classList.add('show');
         el.settingsOverlay.setAttribute('aria-hidden', 'false');
         el.apiKey.focus();
@@ -2917,12 +2927,23 @@
     el.langOverride.addEventListener('change', (e) => {
       state.langOverride = e.target.value;
       persistConfig(STORAGE_KEYS.LANG_OVERRIDE, state.langOverride);
-      // Re-detect and update chips
       const text = el.src.value.trim();
-      if (text) {
-        const srcLang = resolveSrcLang(text);
-        state.detected = srcLang;
-        setLangChips(srcLang);
+      if (state.debounce) {
+        clearTimeout(state.debounce);
+        state.debounce = null;
+      }
+      abortInFlight();
+      state.detected = text ? resolveSrcLang(text) : null;
+      setLangChips(state.detected);
+      clearOutputs();
+      closeAllReverse();
+      if (!text) return;
+      if (state.auto) {
+        translateAll().catch(() => {});
+      } else {
+        setStatus(1, '請重新翻譯');
+        setStatus(2, '請重新翻譯');
+        toast('語言已變更，請重新翻譯');
       }
     });
 
@@ -3070,6 +3091,7 @@
 
       const data = await res.json();
       if (data.error) throw new Error(data.error.message);
+      if (!data.audioContent) throw new Error('Cloud TTS returned no audioContent');
 
       const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
       return audio;
@@ -3286,8 +3308,10 @@
           }
 
           const json = await res.json();
-          const result = (json?.choices?.[0]?.message?.content || '').trim();
+          const choice = json?.choices?.[0];
+          const result = (choice?.message?.content || '').trim();
           revOut.textContent = result;
+          if (choice?.finish_reason === 'length') showTruncationWarning('反譯結果');
           return;
         }
         throw new Error(lastText || 'All models failed');
@@ -3734,6 +3758,7 @@
       };
 
       let doneFlag = false;
+      let truncated = false;
 
       while (true) {
         const { value, done } = await reader.read();
@@ -3761,7 +3786,9 @@
 
           try {
             const json = JSON.parse(data);
-            const delta = json?.choices?.[0]?.delta?.content || '';
+            const choice = json?.choices?.[0];
+            if (choice?.finish_reason === 'length') truncated = true;
+            const delta = choice?.delta?.content || '';
             if (delta) {
               full += delta;
               domBuf += delta;
@@ -3781,6 +3808,7 @@
       }
       flush();
       updateOutputCount(which);
+      if (truncated) showTruncationWarning(`譯文 ${which}`);
 
       if (!state.autoRefine) return;
       if (state.activeJobId !== jobId) return;
@@ -3850,7 +3878,9 @@
           }
 
           const json = await res.json();
-          const refined = (json?.choices?.[0]?.message?.content || '').trim();
+          const choice = json?.choices?.[0];
+          const refined = (choice?.message?.content || '').trim();
+          if (choice?.finish_reason === 'length') showTruncationWarning('潤稿結果');
           return refined || base;
         }
         return base;
@@ -4056,22 +4086,32 @@
       URL.revokeObjectURL(a.href);
     }
 
-    function parseCSVRow(row){
-      const out = []; let cur = ''; let inQ = false;
-      for (let i = 0; i < row.length; i++){
-        const c = row[i];
+    function parseCSVText(text){
+      const rows = [];
+      let row = [];
+      let cur = '';
+      let inQ = false;
+      const pushRow = () => {
+        row.push(cur);
+        if (row.some(cell => String(cell).trim())) rows.push(row);
+        row = [];
+        cur = '';
+      };
+      for (let i = 0; i < text.length; i++){
+        const c = text[i];
         if (inQ){
-          if (c === '"' && row[i+1] === '"'){ cur += '"'; i++; }
+          if (c === '"' && text[i+1] === '"'){ cur += '"'; i++; }
           else if (c === '"') inQ = false;
           else cur += c;
         } else {
-          if (c === ','){ out.push(cur); cur = ''; }
-          else if (c === '"') inQ = true;
-          else cur += c;
+          if (c === '"') inQ = true;
+          else if (c === ','){ row.push(cur); cur = ''; }
+          else if (c === '\n') pushRow();
+          else if (c !== '\r') cur += c;
         }
       }
-      out.push(cur);
-      return out;
+      if (cur || row.length) pushRow();
+      return rows;
     }
 
     function importGlossaryFile(file){
@@ -4079,11 +4119,11 @@
       fr.onload = () => {
         try {
           const text = String(fr.result || '');
-          const rows = text.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
-          const start = rows[0]?.toLowerCase().startsWith('src') ? 1 : 0;
+          const rows = parseCSVText(text);
+          const start = String(rows[0]?.[0] || '').trim().toLowerCase().startsWith('src') ? 1 : 0;
           let added = 0;
           for (let i = start; i < rows.length; i++){
-            const cells = parseCSVRow(rows[i]);
+            const cells = rows[i];
             if (!cells[0]) continue;
             state.glossary.push({ src: cells[0]||'', tgt: cells[1]||'' });
             added++;
@@ -4099,11 +4139,20 @@
     }
 
     function openGlossary(show){
-      el.glossaryOverlay.classList.toggle('show', !!show);
-      el.glossaryOverlay.setAttribute('aria-hidden', show ? 'false' : 'true');
       if (show){
+        if (el.settingsOverlay?.classList.contains('show')) openSettings(false);
+        el.glossaryOverlay.classList.add('show');
+        el.glossaryOverlay.setAttribute('aria-hidden', 'false');
         renderGlossary();
         if (typeof trapFocusIn === 'function') trapFocusIn(el.glossaryOverlay.querySelector('.modal'));
+      } else {
+        if (typeof releaseFocusTrap === 'function') releaseFocusTrap();
+        if (el.glossaryOverlay.contains(document.activeElement)) {
+          document.activeElement.blur();
+          el.btnGlossary?.focus({ preventScroll: true });
+        }
+        el.glossaryOverlay.classList.remove('show');
+        el.glossaryOverlay.setAttribute('aria-hidden', 'true');
       }
     }
 
@@ -4151,7 +4200,7 @@
     function persistChat(){ try { localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(state.chatHistory)); } catch (e){ console.warn('persistChat', e); } }
 
     function escapeAttr(s) {
-      return escapeHTML(String(s || '')).replace(/"/g, '&quot;');
+      return String(s || '').replace(/"/g, '&quot;');
     }
 
     function renderInlineMarkdown(text) {
@@ -4356,7 +4405,7 @@
           }
           const reader = res.body.getReader();
           const dec = new TextDecoder();
-          let buf = ''; let full = '';
+          let buf = ''; let full = ''; let truncated = false; let doneFlag = false;
           while (true){
             const { value, done } = await reader.read();
             if (done) break;
@@ -4367,15 +4416,19 @@
               const t = line.trim();
               if (!t || !t.startsWith('data:')) continue;
               const p = t.slice(5).trim();
-              if (p === '[DONE]') break;
+              if (p === '[DONE]') { doneFlag = true; break; }
               try {
                 const j = JSON.parse(p);
-                const d = j?.choices?.[0]?.delta?.content;
+                const choice = j?.choices?.[0];
+                if (choice?.finish_reason === 'length') truncated = true;
+                const d = choice?.delta?.content;
                 if (d){ full += d; placeholder.content = full; renderChat(); }
               } catch {}
             }
+            if (doneFlag) break;
           }
           placeholder.content = full.trim() || '(無回應)';
+          if (truncated) placeholder.content += '\n\n⚠ 可能被截斷，請檢查是否完整。';
           placeholder.streaming = false;
           renderChat();
           persistChat();
