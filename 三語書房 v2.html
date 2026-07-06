@@ -975,6 +975,58 @@
       padding:4px 0 0;
       line-height:1.55;
     }
+    .api-key-help{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      width:max-content;
+      max-width:100%;
+      color:var(--accent-src);
+      text-decoration:none;
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:0.04em;
+      line-height:1.5;
+    }
+    .api-key-help:hover{
+      color:var(--text);
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+    .api-key-banner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin:0 0 14px;
+      padding:13px 14px;
+      border:1.5px solid var(--accent-src-line);
+      border-radius:var(--radius);
+      background:linear-gradient(135deg,var(--accent-src-bg),var(--panel-2));
+      box-shadow:0 16px 38px rgba(0,0,0,0.18), inset 4px 0 0 var(--accent-src);
+    }
+    .api-key-banner[hidden]{ display:none; }
+    .api-key-banner strong{
+      display:block;
+      margin-bottom:3px;
+      font-size:14px;
+      line-height:1.35;
+      color:var(--text);
+      font-weight:700;
+    }
+    .api-key-banner span{
+      display:block;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .api-key-banner .icon{
+      flex:0 0 auto;
+      border-color:var(--accent-src-line);
+      color:var(--text);
+      background:var(--accent-src-bg);
+      padding:8px 10px;
+    }
 
     /* ============================================================
        TTS — speaking states
@@ -1141,6 +1193,7 @@
     @media (max-width: 980px){
       .wrap{ padding:14px 16px 12px; }
       .toprow{ flex-wrap:wrap; gap:8px; }
+      .api-key-banner{ align-items:flex-start; flex-direction:column; }
       .masthead .subtitle{ display:none; }
       .masthead .wordmark{ font-size:22px; }
     }
@@ -1760,6 +1813,7 @@
       <div class="field">
         <label for="apiKey">API Key</label>
         <input class="in" id="apiKey" type="password" placeholder="sk-…" autocomplete="off" />
+        <a class="api-key-help" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">取得 OpenAI API Key</a>
       </div>
 
       <div class="field">
@@ -1807,6 +1861,14 @@
       <button class="icon" id="btnChat" aria-label="Open AI assistant" title="AI 助手 (Chat)">助手</button>
       <button class="icon" id="btnTheme" aria-label="Toggle dark/light theme" title="Toggle theme">◑</button>
       <button class="icon" id="btnSettings" aria-label="Open settings" title="Settings">⚙ 設定</button>
+    </div>
+
+    <div class="api-key-banner" id="apiKeyBanner" role="status" aria-live="polite" hidden>
+      <div>
+        <strong>先設定 OpenAI API Key 才能翻譯</strong>
+        <span>輸入一次後會儲存在這台裝置；之後即可使用翻譯、潤稿、反譯與 AI 助手。</span>
+      </div>
+      <button class="icon primary" id="btnApiKeyBanner" type="button">輸入 API Key</button>
     </div>
 
     <div class="grid">
@@ -2369,6 +2431,8 @@
       btnDone: $('btnDone'),
       btnTheme: $('btnTheme'),
       langOverride: $('langOverride'),
+      apiKeyBanner: $('apiKeyBanner'),
+      btnApiKeyBanner: $('btnApiKeyBanner'),
       apiKey: $('apiKey'),
       model: $('model'),
       toneMode: $('toneMode'),
@@ -2550,6 +2614,13 @@
       showError(`${label}可能被截斷，請檢查結果是否完整。`);
     }
 
+    function updateApiKeyPrompt() {
+      if (!el.apiKeyBanner) return;
+      const missing = !state.apiKey;
+      el.apiKeyBanner.hidden = !missing;
+      el.apiKeyBanner.setAttribute('aria-hidden', missing ? 'false' : 'true');
+    }
+
     function updatePreEditControls() {
       if (!el.btnPreEdit) return;
       const hasSource = !!el.src.value.trim();
@@ -2563,6 +2634,7 @@
 
     function setBusy(isBusy) {
       state.busy = isBusy;
+      updateApiKeyPrompt();
       el.btnTranslate.disabled = isBusy || state.preEditing || !el.src.value.trim();
 
       const out1Text = el.out1.textContent.trim();
@@ -2898,6 +2970,10 @@
       state.apiKey = e.target.value.trim();
       persistConfig(STORAGE_KEYS.API_KEY, state.apiKey);
       setBusy(state.busy);
+    });
+
+    el.btnApiKeyBanner && el.btnApiKeyBanner.addEventListener('click', () => {
+      openSettings(true);
     });
 
     el.model.addEventListener('change', (e) => {
