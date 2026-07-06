@@ -4266,6 +4266,7 @@
       if (!el.chatList) return;
       el.chatList.innerHTML = '';
       for (const m of state.chatHistory){
+        if (m.hidden) continue;
         const div = document.createElement('div');
         div.className = 'chat-msg ' + (m.role === 'user' ? 'user' : 'assistant');
         if (m.streaming) div.classList.add('streaming');
@@ -4305,13 +4306,14 @@
       }
     }
 
-    async function sendChatMessage(overrideText){
+    async function sendChatMessage(overrideText, options = {}){
+      if (overrideText && typeof Event !== 'undefined' && overrideText instanceof Event) overrideText = undefined;
       const text = String(overrideText ?? el.chatInput?.value ?? '').trim();
       if (!text) return;
       if (state.chatBusy) return;
       if (!ensureApiKey(true)) return;
       el.chatInput.value = '';
-      state.chatHistory.push({ role:'user', content:text, ts:Date.now() });
+      state.chatHistory.push({ role:'user', content:text, ts:Date.now(), hidden: !!options.hideUserMessage });
       while (state.chatHistory.length > CHAT_HISTORY_LIMIT) state.chatHistory.shift();
       persistChat();
       renderChat();
@@ -4394,7 +4396,7 @@
     el.btnChat && el.btnChat.addEventListener('click', () => openChat(true));
     el.btnCloseChat && el.btnCloseChat.addEventListener('click', () => openChat(false));
     el.btnClearChat && el.btnClearChat.addEventListener('click', clearChatHistory);
-    el.btnSendChat && el.btnSendChat.addEventListener('click', sendChatMessage);
+    el.btnSendChat && el.btnSendChat.addEventListener('click', () => sendChatMessage());
     el.chatInput && el.chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendChatMessage(); }
     });
@@ -4569,7 +4571,7 @@ ${alternativeInstruction}
       const prompt = buildSelectionAskPrompt(payload);
       hideSelectionTooltip();
       openChat(true);
-      sendChatMessage(prompt).catch(() => {});
+      sendChatMessage(prompt, { hideUserMessage: true }).catch(() => {});
     });
     document.addEventListener('mousedown', (e) => {
       if (el.selectionTooltip?.contains(e.target)) return;
