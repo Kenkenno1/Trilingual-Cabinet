@@ -3001,6 +3001,8 @@
     el.model.addEventListener('change', (e) => {
       state.model = e.target.value;
       persistConfig(STORAGE_KEYS.MODEL, state.model);
+      state.lastWorkingModel = state.model;
+      persistConfig(STORAGE_KEYS.LAST_MODEL, state.lastWorkingModel);
     });
 
     el.toneMode.addEventListener('change', (e) => {
@@ -3579,8 +3581,10 @@
         }
 
         const json = await res.json();
-        const result = cleanPreEditResult(json?.choices?.[0]?.message?.content || '');
+        const choice = json?.choices?.[0];
+        const result = cleanPreEditResult(choice?.message?.content || '');
         if (!result) throw new Error('Pre-edit returned empty text');
+        if (choice?.finish_reason === 'length') showTruncationWarning('清理結果');
         return result;
       }
       throw new Error(lastText || 'All models failed');
