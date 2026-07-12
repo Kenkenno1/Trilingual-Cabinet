@@ -3455,6 +3455,8 @@
         try { state.preEditController.abort(); } catch (e) { console.warn('Pre-edit abort failed:', e.message); }
       }
       state.preEditController = null;
+      state.refining[1] = false;
+      state.refining[2] = false;
       setBusy(false);
       setStatus(1, '');
       setStatus(2, '');
