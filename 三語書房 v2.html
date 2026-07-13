@@ -1769,7 +1769,7 @@
 
       <div class="glossary-suggestions" id="glossarySuggestions" style="display:none">
         <div class="glossary-section-label">
-          <span>AI 建議（一鍵採用）</span>
+          <span id="glossarySuggestionLabel">AI 建議（一鍵採用）</span>
           <button class="icon" id="btnDismissSuggestions" title="忽略全部建議">✕</button>
         </div>
         <div id="suggestionList"></div>
@@ -4016,9 +4016,15 @@
     state.chatController = null;
     state.chatOpen = false;
     state.selectionAsk = null;
+    state.glossaryController = null;
 
     const CHAT_HISTORY_LIMIT = 50;
     const CHAT_API_WINDOW = 20;
+    const GLOSSARY_MAX_TERMS = 15;
+    const GLOSSARY_MAX_FIELD_CHARS = 60;
+    const GLOSSARY_TOKENS_PER_TERM = 80;
+    const GLOSSARY_TOKEN_SAFETY = 2;
+    const GLOSSARY_MAX_COMPLETION_TOKENS = GLOSSARY_MAX_TERMS * GLOSSARY_TOKENS_PER_TERM * GLOSSARY_TOKEN_SAFETY;
 
     // Bind new DOM elements
     el.btnGlossary = document.getElementById('btnGlossary');
@@ -4035,6 +4041,7 @@
     el.glossaryFileInput = document.getElementById('glossaryFileInput');
     el.glossaryEmpty = document.getElementById('glossaryEmpty');
     el.glossarySuggestions = document.getElementById('glossarySuggestions');
+    el.glossarySuggestionLabel = document.getElementById('glossarySuggestionLabel');
     el.suggestionList = document.getElementById('suggestionList');
     el.btnDismissSuggestions = document.getElementById('btnDismissSuggestions');
 
@@ -4232,6 +4239,178 @@
       fr.readAsText(file);
     }
 
+    function normalizeGlossaryTerm(value){
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function setGlossaryExtractBusy(busy){
+      if (!el.btnExtractGlossary) return;
+      el.btnExtractGlossary.textContent = busy ? '抽取中…' : '從原文抽取';
+      el.btnExtractGlossary.disabled = !!busy;
+    }
+
+    function dismissGlossarySuggestions(){
+      if (el.suggestionList) el.suggestionList.innerHTML = '';
+      if (el.glossarySuggestions) el.glossarySuggestions.style.display = 'none';
+    }
+
+    function addExtractedGlossaryTerm(src, tgt){
+      const srcKey = normalizeGlossaryTerm(src);
+      if (!srcKey || state.glossary.some(g => normalizeGlossaryTerm(g?.src) === srcKey)) return false;
+      state.glossary.unshift({ src: String(src).trim(), tgt: String(tgt).trim() });
+      persistGlossary();
+      renderGlossary();
+      return true;
+    }
+
+    function renderGlossarySuggestions(rawTerms, targetLang){
+      const list = el.suggestionList;
+      if (!list || !el.glossarySuggestions) return 0;
+      list.innerHTML = '';
+      const existing = new Set(state.glossary.map(g => normalizeGlossaryTerm(g?.src)).filter(Boolean));
+      const batch = new Set();
+      const terms = [];
+      for (const raw of Array.isArray(rawTerms) ? rawTerms : []){
+        const source = String(raw?.source || '').trim();
+        const translation = String(raw?.translation || '').trim();
+        const sourceKey = normalizeGlossaryTerm(source);
+        if (!source || !translation) continue;
+        if (source.length > GLOSSARY_MAX_FIELD_CHARS || translation.length > GLOSSARY_MAX_FIELD_CHARS) continue;
+        if (existing.has(sourceKey) || batch.has(sourceKey)) continue;
+        batch.add(sourceKey);
+        terms.push({ source, translation });
+        if (terms.length >= GLOSSARY_MAX_TERMS) break;
+      }
+
+      const targetLabel = LANGUAGES[targetLang]?.display || targetLang;
+      if (el.glossarySuggestionLabel) el.glossarySuggestionLabel.textContent = `AI 建議 · 譯入 ${targetLabel}（一鍵採用）`;
+      for (const term of terms){
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        const sourceText = document.createElement('span');
+        sourceText.className = 'suggestion-text';
+        sourceText.textContent = term.source;
+        const translationText = document.createElement('span');
+        translationText.className = 'suggestion-text';
+        translationText.textContent = term.translation;
+        const adopt = document.createElement('button');
+        adopt.type = 'button';
+        adopt.className = 'icon primary';
+        adopt.textContent = '採用';
+        adopt.addEventListener('click', () => {
+          if (!addExtractedGlossaryTerm(term.source, term.translation)){
+            toast('該字彙已存在');
+            return;
+          }
+          item.remove();
+          if (!list.children.length) dismissGlossarySuggestions();
+        });
+        item.appendChild(sourceText);
+        item.appendChild(translationText);
+        item.appendChild(adopt);
+        list.appendChild(item);
+      }
+      el.glossarySuggestions.style.display = terms.length ? '' : 'none';
+      return terms.length;
+    }
+
+    function parseGlossaryExtraction(content){
+      const cleaned = String(content || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/i, '').trim();
+      let parsed;
+      try {
+        parsed = JSON.parse(cleaned);
+      } catch {
+        throw new Error('AI 回傳的字彙格式無法解析，未採用任何建議。');
+      }
+      if (!Array.isArray(parsed?.terms)) throw new Error('AI 回傳的字彙格式不正確，未採用任何建議。');
+      return parsed.terms;
+    }
+
+    async function extractGlossaryFromSource(){
+      const sourceText = (el.src?.value || '').trim();
+      if (!sourceText){
+        toast('原文為空');
+        return;
+      }
+      if (!ensureApiKey(true)) return;
+
+      if (state.glossaryController){
+        try { state.glossaryController.abort(); } catch {}
+      }
+      const controller = new AbortController();
+      state.glossaryController = controller;
+      setGlossaryExtractBusy(true);
+      dismissGlossarySuggestions();
+
+      let lastText = '';
+      try {
+        const sourceLang = resolveSrcLang(sourceText);
+        const targetLang = getTargets(sourceLang)[0];
+        const existingTerms = state.glossary.map(g => String(g?.src || '').trim()).filter(Boolean).slice(0, 80);
+        const skipExisting = existingTerms.length ? `\n\nAlready in glossary; skip these source terms: ${existingTerms.join(', ')}` : '';
+        const systemPrompt = `You are a terminology extractor for a translator.
+- Extract 5-15 proper nouns, technical terms, brand names, product names, and repeated jargon from the source text.
+- Source language: ${LANGUAGES[sourceLang].promptName}.
+- Translate each term into target language: ${LANGUAGES[targetLang].promptName}.
+- Each source and translation field must be a concise term of at most ${GLOSSARY_MAX_FIELD_CHARS} characters, not a sentence.
+- Skip generic words, articles, prepositions, and common verbs.
+- Return ONLY valid JSON in this exact shape: {"terms":[{"source":"string","translation":"string"}]}.
+- No commentary and no markdown fences.${skipExisting}`;
+        const makeBody = (model) => ({
+          model,
+          temperature: 0.2,
+          max_completion_tokens: GLOSSARY_MAX_COMPLETION_TOKENS,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: sourceText },
+          ],
+        });
+
+        for (const model of modelChain(state.model)){
+          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(makeBody(model)),
+            signal: controller.signal,
+          });
+          if (!res.ok){
+            lastText = await safeReadText(res);
+            if (isInvalidModelError(res.status, lastText)) continue;
+            throw new Error(lastText || `HTTP ${res.status}`);
+          }
+          if (model !== state.lastWorkingModel){
+            state.lastWorkingModel = model;
+            persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+          }
+          const json = await res.json();
+          const choice = json?.choices?.[0];
+          if (choice?.finish_reason === 'length'){
+            showTruncationWarning('字彙抽取');
+            const truncated = new Error('Glossary extraction truncated');
+            truncated.glossaryTruncated = true;
+            throw truncated;
+          }
+          const terms = parseGlossaryExtraction(choice?.message?.content || '');
+          const rendered = renderGlossarySuggestions(terms, targetLang);
+          if (!rendered) toast('未抽取到新字彙');
+          return;
+        }
+        throw new Error(lastText || '所有模型都無法完成字彙抽取');
+      } catch (e){
+        if (isAbortError(e) || e?.glossaryTruncated) return;
+        showError('抽取失敗：' + formatApiError(e));
+      } finally {
+        if (state.glossaryController === controller){
+          state.glossaryController = null;
+          setGlossaryExtractBusy(false);
+        }
+      }
+    }
+
     function openGlossary(show){
       if (show){
         if (el.settingsOverlay?.classList.contains('show')) openSettings(false);
@@ -4240,6 +4419,9 @@
         renderGlossary();
         if (typeof trapFocusIn === 'function') trapFocusIn(el.glossaryOverlay.querySelector('.modal'));
       } else {
+        if (state.glossaryController){
+          try { state.glossaryController.abort(); } catch {}
+        }
         if (typeof releaseFocusTrap === 'function') releaseFocusTrap();
         if (el.glossaryOverlay.contains(document.activeElement)) {
           document.activeElement.blur();
@@ -4260,10 +4442,8 @@
     el.glossaryFileInput && el.glossaryFileInput.addEventListener('change', (ev) => {
       const f = ev.target.files?.[0]; if (f) importGlossaryFile(f); ev.target.value = '';
     });
-    if (el.btnExtractGlossary) el.btnExtractGlossary.disabled = true; // AI 抽取功能未還原
-    el.btnDismissSuggestions && el.btnDismissSuggestions.addEventListener('click', () => {
-      if (el.glossarySuggestions) el.glossarySuggestions.style.display = 'none';
-    });
+    el.btnExtractGlossary && el.btnExtractGlossary.addEventListener('click', () => { extractGlossaryFromSource().catch(() => {}); });
+    el.btnDismissSuggestions && el.btnDismissSuggestions.addEventListener('click', dismissGlossarySuggestions);
 
     // Inject glossary fragment into translation prompts (wrap original buildSystemPrompt)
     if (typeof buildSystemPrompt === 'function'){
