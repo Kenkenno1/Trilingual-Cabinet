@@ -4026,6 +4026,369 @@
     const GLOSSARY_TOKEN_SAFETY = 2;
     const GLOSSARY_MAX_COMPLETION_TOKENS = GLOSSARY_MAX_TERMS * GLOSSARY_TOKENS_PER_TERM * GLOSSARY_TOKEN_SAFETY;
 
+    // P1a large-text glossary core: pure functions only.
+    const LARGE_TEXT_SHORT_PATH_CHARS = 8000;
+    const LARGE_TEXT_SOFT_TOKEN_LIMIT = 60000;
+    const LARGE_TEXT_HARD_TOKEN_LIMIT = 80000;
+    const LARGE_TEXT_MAX_CHUNKS = 20;
+    const LARGE_TEXT_CHUNK_TARGET_TOKENS = 3000;
+    const LARGE_TEXT_CHUNK_MAX_TOKENS = 4000;
+    const LARGE_TEXT_OVERLAP_RATIO = 0.12;
+    const LARGE_TEXT_OVERLAP_MAX_TOKENS = 360;
+    const LARGE_TEXT_CANDIDATES_PER_CHUNK = 8;
+    const LARGE_TEXT_FINAL_CANDIDATES = 30;
+    const LARGE_TEXT_MAX_FIELD_CHARS = 60;
+    const LARGE_TEXT_ABSOLUTE_CHAR_PREFLIGHT = 320000;
+
+    function largeTextTokenUnitsForCodePoint(ch){
+      const codePoint = ch.codePointAt(0);
+      if (codePoint <= 0x7f) return /\s/.test(ch) ? 0 : 1;
+      return 4;
+    }
+
+    function estimateLargeTextTokens(value){
+      let units = 0;
+      for (const ch of String(value || '')) units += largeTextTokenUnitsForCodePoint(ch);
+      return Math.ceil(units / 4);
+    }
+
+    function getLargeTextPreflight(value, chunkCount){
+      const text = String(value || '');
+      const charCount = text.length;
+      const estimatedTokens = estimateLargeTextTokens(text);
+      const result = {
+        charCount,
+        estimatedTokens,
+        route: charCount <= LARGE_TEXT_SHORT_PATH_CHARS ? 'short' : 'chunked',
+        warning: estimatedTokens > LARGE_TEXT_SOFT_TOKEN_LIMIT ? 'large-input' : null,
+        reason: null,
+      };
+      if (charCount > LARGE_TEXT_ABSOLUTE_CHAR_PREFLIGHT){
+        result.route = 'reject';
+        result.reason = 'absolute-char-limit';
+      } else if (estimatedTokens > LARGE_TEXT_HARD_TOKEN_LIMIT){
+        result.route = 'reject';
+        result.reason = 'token-limit';
+      } else if (Number.isFinite(chunkCount) && chunkCount > LARGE_TEXT_MAX_CHUNKS){
+        result.route = 'reject';
+        result.reason = 'chunk-limit';
+      }
+      return result;
+    }
+
+    function nextLargeTextCodePointOffset(text, offset){
+      if (offset >= text.length) return text.length;
+      const codePoint = text.codePointAt(offset);
+      return offset + (codePoint > 0xffff ? 2 : 1);
+    }
+
+    function previousLargeTextCodePointOffset(text, offset){
+      if (offset <= 0) return 0;
+      const previous = text.charCodeAt(offset - 1);
+      if (previous >= 0xdc00 && previous <= 0xdfff && offset > 1){
+        const high = text.charCodeAt(offset - 2);
+        if (high >= 0xd800 && high <= 0xdbff) return offset - 2;
+      }
+      return offset - 1;
+    }
+
+    function scanLargeTextPrimaryWindow(text, startOffset){
+      const minTokens = Math.ceil(LARGE_TEXT_CHUNK_TARGET_TOKENS * 0.7);
+      let units = 0;
+      let minOffset = null;
+      let targetOffset = null;
+      let maxOffset = startOffset;
+      let offset = startOffset;
+      while (offset < text.length){
+        const nextOffset = nextLargeTextCodePointOffset(text, offset);
+        const nextUnits = units + largeTextTokenUnitsForCodePoint(text.slice(offset, nextOffset));
+        if (Math.ceil(nextUnits / 4) > LARGE_TEXT_CHUNK_MAX_TOKENS) break;
+        units = nextUnits;
+        offset = nextOffset;
+        maxOffset = offset;
+        const tokens = Math.ceil(units / 4);
+        if (minOffset === null && tokens >= minTokens) minOffset = offset;
+        if (targetOffset === null && tokens >= LARGE_TEXT_CHUNK_TARGET_TOKENS) targetOffset = offset;
+      }
+      return {
+        minOffset: minOffset ?? maxOffset,
+        targetOffset: targetOffset ?? maxOffset,
+        maxOffset,
+        reachedEnd: offset >= text.length,
+      };
+    }
+
+    function findNearestLargeTextBoundary(text, minOffset, targetOffset, maxOffset, pattern){
+      const segment = text.slice(minOffset, maxOffset);
+      let bestOffset = -1;
+      let bestDistance = Infinity;
+      let match;
+      pattern.lastIndex = 0;
+      while ((match = pattern.exec(segment))){
+        const endOffset = minOffset + match.index + match[0].length;
+        const distance = Math.abs(endOffset - targetOffset);
+        const bestIsAfter = bestOffset > targetOffset;
+        const candidateIsAfter = endOffset > targetOffset;
+        if (distance < bestDistance || (distance === bestDistance && bestIsAfter && !candidateIsAfter)){
+          bestOffset = endOffset;
+          bestDistance = distance;
+        }
+        if (!match[0].length) pattern.lastIndex++;
+      }
+      return bestOffset;
+    }
+
+    function chooseLargeTextPrimaryEnd(text, startOffset){
+      const window = scanLargeTextPrimaryWindow(text, startOffset);
+      if (window.reachedEnd) return text.length;
+      const patterns = [
+        /(?:\r?\n)[ \t]*(?:\r?\n)/g,
+        /\r?\n/g,
+        /[。！？!?．.](?:["'”’」』】）》〉]*)/g,
+      ];
+      for (const pattern of patterns){
+        const boundary = findNearestLargeTextBoundary(
+          text,
+          window.minOffset,
+          window.targetOffset,
+          window.maxOffset,
+          pattern,
+        );
+        if (boundary > startOffset) return boundary;
+      }
+      return window.targetOffset > startOffset
+        ? window.targetOffset
+        : nextLargeTextCodePointOffset(text, startOffset);
+    }
+
+    function getLargeTextSuffixStart(text, lowerBound, endOffset, tokenBudget){
+      if (tokenBudget <= 0) return endOffset;
+      let units = 0;
+      let offset = endOffset;
+      while (offset > lowerBound){
+        const previous = previousLargeTextCodePointOffset(text, offset);
+        const nextUnits = units + largeTextTokenUnitsForCodePoint(text.slice(previous, offset));
+        if (Math.ceil(nextUnits / 4) > tokenBudget) break;
+        units = nextUnits;
+        offset = previous;
+      }
+      return offset;
+    }
+
+    function capLargeTextOverlapToTwoSentences(text, startOffset, endOffset){
+      const segment = text.slice(startOffset, endOffset);
+      const endings = [];
+      const pattern = /[。！？!?．.](?:["'”’」』】）》〉]*)/g;
+      let match;
+      while ((match = pattern.exec(segment))) endings.push(startOffset + match.index + match[0].length);
+      return endings.length > 2 ? Math.max(startOffset, endings[endings.length - 3]) : startOffset;
+    }
+
+    function chunkLargeGlossaryText(value){
+      const text = String(value || '');
+      if (!text) return [];
+      const chunks = [];
+      let primaryStartOffset = 0;
+      while (primaryStartOffset < text.length){
+        const endOffset = chooseLargeTextPrimaryEnd(text, primaryStartOffset);
+        const primaryText = text.slice(primaryStartOffset, endOffset);
+        const primaryTokens = estimateLargeTextTokens(primaryText);
+        let startOffset = primaryStartOffset;
+        if (chunks.length){
+          const previous = chunks[chunks.length - 1];
+          const previousPrimaryTokens = estimateLargeTextTokens(
+            text.slice(previous.primaryStartOffset, previous.endOffset),
+          );
+          const desiredOverlap = Math.min(
+            Math.floor(previousPrimaryTokens * LARGE_TEXT_OVERLAP_RATIO),
+            LARGE_TEXT_OVERLAP_MAX_TOKENS,
+          );
+          const overlapBudget = Math.max(0, Math.min(
+            desiredOverlap,
+            LARGE_TEXT_CHUNK_MAX_TOKENS - primaryTokens,
+          ));
+          startOffset = getLargeTextSuffixStart(
+            text,
+            previous.primaryStartOffset,
+            primaryStartOffset,
+            overlapBudget,
+          );
+          startOffset = capLargeTextOverlapToTwoSentences(text, startOffset, primaryStartOffset);
+          while (
+            startOffset < primaryStartOffset
+            && estimateLargeTextTokens(text.slice(startOffset, endOffset)) > LARGE_TEXT_CHUNK_MAX_TOKENS
+          ){
+            startOffset = nextLargeTextCodePointOffset(text, startOffset);
+          }
+        }
+        const chunkText = text.slice(startOffset, endOffset);
+        chunks.push({
+          chunkId: chunks.length,
+          startOffset,
+          endOffset,
+          primaryStartOffset,
+          text: chunkText,
+          estimatedTokens: estimateLargeTextTokens(chunkText),
+        });
+        primaryStartOffset = endOffset;
+      }
+      return chunks;
+    }
+
+    function planLargeGlossaryText(value){
+      const initial = getLargeTextPreflight(value);
+      if (initial.route !== 'chunked') return { preflight: initial, chunks: [] };
+      const chunks = chunkLargeGlossaryText(value);
+      return { preflight: getLargeTextPreflight(value, chunks.length), chunks };
+    }
+
+    function normalizeLargeGlossaryTerm(value){
+      return String(value || '').normalize('NFKC').trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function compareLargeTextCodePoints(left, right){
+      const a = Array.from(String(left || ''), ch => ch.codePointAt(0));
+      const b = Array.from(String(right || ''), ch => ch.codePointAt(0));
+      const length = Math.min(a.length, b.length);
+      for (let i = 0; i < length; i++){
+        if (a[i] !== b[i]) return a[i] - b[i];
+      }
+      return a.length - b.length;
+    }
+
+    function getLargeGlossaryCategoryPriority(value){
+      const category = normalizeLargeGlossaryTerm(value);
+      if (/brand|product|品牌|產品/.test(category)) return 4;
+      if (/proper|name|entity|專有|人名|地名|組織/.test(category)) return 3;
+      if (/technical|term|技術|術語/.test(category)) return 2;
+      if (/jargon|行話/.test(category)) return 1;
+      return 0;
+    }
+
+    function normalizeLargeGlossaryConfidence(value){
+      const confidence = Number(value);
+      if (!Number.isFinite(confidence)) return 0;
+      return Math.max(0, Math.min(1, confidence));
+    }
+
+    function compareLargeTextChunkIds(left, right){
+      if (Number.isFinite(left) && Number.isFinite(right)) return left - right;
+      return compareLargeTextCodePoints(String(left), String(right));
+    }
+
+    function mergeLargeGlossaryCandidates(chunkResults, validChunkIds){
+      const allowedChunks = new Set(Array.isArray(validChunkIds) ? validChunkIds : []);
+      const enforceAllowedChunks = Array.isArray(validChunkIds);
+      const merged = new Map();
+      for (const result of Array.isArray(chunkResults) ? chunkResults : []){
+        const chunkId = result?.chunkId;
+        if (chunkId === undefined || chunkId === null) continue;
+        if (enforceAllowedChunks && !allowedChunks.has(chunkId)) continue;
+        const seenInChunk = new Set();
+        let accepted = 0;
+        for (const raw of Array.isArray(result?.terms) ? result.terms : []){
+          if (typeof raw?.source !== 'string' || typeof raw?.translation !== 'string') continue;
+          const source = raw.source.trim();
+          const translation = raw.translation.trim();
+          const key = normalizeLargeGlossaryTerm(source);
+          if (!key || !translation || seenInChunk.has(key)) continue;
+          if (
+            Array.from(source).length > LARGE_TEXT_MAX_FIELD_CHARS
+            || Array.from(translation).length > LARGE_TEXT_MAX_FIELD_CHARS
+          ) continue;
+          if (accepted >= LARGE_TEXT_CANDIDATES_PER_CHUNK) break;
+          seenInChunk.add(key);
+          accepted++;
+          const fallbackOffset = Number.isFinite(result?.startOffset) ? Math.max(0, Math.trunc(result.startOffset)) : 0;
+          const firstOffset = Number.isFinite(raw?.firstOffset) ? Math.max(0, Math.trunc(raw.firstOffset)) : fallbackOffset;
+          const categoryPriority = getLargeGlossaryCategoryPriority(raw?.category);
+          const confidence = normalizeLargeGlossaryConfidence(raw?.confidence);
+          let record = merged.get(key);
+          if (!record){
+            record = {
+              key,
+              source,
+              translation,
+              chunkIds: [],
+              distinctChunkCount: 0,
+              categoryPriority,
+              confidence,
+              firstOffset,
+            };
+            merged.set(key, record);
+          } else {
+            const displayOrder = compareLargeTextCodePoints(source, record.source)
+              || compareLargeTextCodePoints(translation, record.translation);
+            const earlier = firstOffset < record.firstOffset
+              || (firstOffset === record.firstOffset && displayOrder < 0);
+            if (earlier){
+              record.source = source;
+              record.translation = translation;
+              record.firstOffset = firstOffset;
+            }
+            record.categoryPriority = Math.max(record.categoryPriority, categoryPriority);
+            record.confidence = Math.max(record.confidence, confidence);
+          }
+          if (!record.chunkIds.includes(chunkId)) record.chunkIds.push(chunkId);
+        }
+      }
+      return Array.from(merged.values()).map(record => {
+        record.chunkIds.sort(compareLargeTextChunkIds);
+        record.distinctChunkCount = record.chunkIds.length;
+        return record;
+      });
+    }
+
+    function compareLargeGlossaryCandidateRank(left, right){
+      return right.distinctChunkCount - left.distinctChunkCount
+        || right.categoryPriority - left.categoryPriority
+        || right.confidence - left.confidence
+        || left.firstOffset - right.firstOffset
+        || compareLargeTextCodePoints(left.key, right.key);
+    }
+
+    function rankLargeGlossaryCandidates(candidates){
+      return (Array.isArray(candidates) ? candidates : []).slice().sort(compareLargeGlossaryCandidateRank);
+    }
+
+    function excludeExistingLargeGlossaryCandidates(candidates, glossaryRows){
+      const existing = new Set(
+        (Array.isArray(glossaryRows) ? glossaryRows : [])
+          .map(row => normalizeLargeGlossaryTerm(row?.src))
+          .filter(Boolean),
+      );
+      return (Array.isArray(candidates) ? candidates : []).filter(candidate => !existing.has(candidate?.key));
+    }
+
+    function selectLargeGlossaryCandidates(candidates, successfulChunkIds, limit = LARGE_TEXT_FINAL_CANDIDATES){
+      const cap = Math.max(0, Math.min(LARGE_TEXT_FINAL_CANDIDATES, Math.trunc(limit) || 0));
+      if (!cap) return [];
+      const ranked = rankLargeGlossaryCandidates(candidates);
+      const successful = Array.isArray(successfulChunkIds) ? successfulChunkIds : [];
+      const successSet = new Set(successful);
+      const selected = [];
+      const selectedKeys = new Set();
+      const representedChunks = new Set();
+      for (const chunkId of successful){
+        if (selected.length >= cap) break;
+        if (representedChunks.has(chunkId)) continue;
+        const candidate = ranked.find(item => item.chunkIds.includes(chunkId) && !selectedKeys.has(item.key));
+        if (!candidate) continue;
+        selected.push(candidate);
+        selectedKeys.add(candidate.key);
+        for (const represented of candidate.chunkIds) representedChunks.add(represented);
+      }
+      for (const candidate of ranked){
+        if (selected.length >= cap) break;
+        if (!candidate.chunkIds.some(chunkId => successSet.has(chunkId))) continue;
+        if (selectedKeys.has(candidate.key)) continue;
+        selected.push(candidate);
+        selectedKeys.add(candidate.key);
+      }
+      return selected;
+    }
+    // End P1a large-text glossary core.
+
     // Bind new DOM elements
     el.btnGlossary = document.getElementById('btnGlossary');
     el.glossaryOverlay = document.getElementById('glossaryOverlay');
