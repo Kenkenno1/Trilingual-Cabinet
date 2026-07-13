@@ -1293,6 +1293,27 @@
       align-items:center;
       justify-content:space-between;
     }
+    .glossary-section-actions{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .glossary-extract-progress{
+      display:grid;
+      grid-template-columns:minmax(120px,1fr) auto;
+      gap:8px;
+      align-items:center;
+      margin-bottom:8px;
+      color:var(--muted);
+      font-family:var(--font-mono);
+      font-size:11px;
+    }
+    .glossary-extract-progress[hidden]{ display:none; }
+    .glossary-extract-progress progress{
+      width:100%;
+      height:8px;
+      accent-color:var(--accent-src);
+    }
     .suggestion-item{
       display:grid;
       grid-template-columns:1fr 1fr auto;
@@ -1770,7 +1791,14 @@
       <div class="glossary-suggestions" id="glossarySuggestions" style="display:none">
         <div class="glossary-section-label">
           <span id="glossarySuggestionLabel">AI 建議（一鍵採用）</span>
-          <button class="icon" id="btnDismissSuggestions" title="忽略全部建議">✕</button>
+          <div class="glossary-section-actions">
+            <button class="icon" id="btnCancelGlossaryExtract" title="取消目前的字彙抽取" hidden>取消抽取</button>
+            <button class="icon" id="btnDismissSuggestions" title="忽略全部建議">✕</button>
+          </div>
+        </div>
+        <div class="glossary-extract-progress" id="glossaryExtractProgress" hidden>
+          <progress id="glossaryExtractProgressBar" max="1" value="0"></progress>
+          <span id="glossaryExtractProgressText" role="status" aria-live="polite"></span>
         </div>
         <div id="suggestionList"></div>
       </div>
@@ -4017,6 +4045,7 @@
     state.chatOpen = false;
     state.selectionAsk = null;
     state.glossaryController = null;
+    state.glossaryExtractGen = 0;
 
     const CHAT_HISTORY_LIMIT = 50;
     const CHAT_API_WINDOW = 20;
@@ -4389,6 +4418,14 @@
     }
     // End P1a large-text glossary core.
 
+    const LARGE_GLOSSARY_CONCURRENCY = 3;
+    const LARGE_GLOSSARY_RETRY_LIMIT = 1;
+    const LARGE_GLOSSARY_RETRY_BACKOFF_MS = 800;
+    // MAX_CHUNKS caps base work units; bounded retries and model fallback may add HTTP attempts.
+    const LARGE_GLOSSARY_MAX_COMPLETION_TOKENS = LARGE_TEXT_CANDIDATES_PER_CHUNK
+      * GLOSSARY_TOKENS_PER_TERM
+      * GLOSSARY_TOKEN_SAFETY;
+
     // Bind new DOM elements
     el.btnGlossary = document.getElementById('btnGlossary');
     el.glossaryOverlay = document.getElementById('glossaryOverlay');
@@ -4407,6 +4444,10 @@
     el.glossarySuggestionLabel = document.getElementById('glossarySuggestionLabel');
     el.suggestionList = document.getElementById('suggestionList');
     el.btnDismissSuggestions = document.getElementById('btnDismissSuggestions');
+    el.btnCancelGlossaryExtract = document.getElementById('btnCancelGlossaryExtract');
+    el.glossaryExtractProgress = document.getElementById('glossaryExtractProgress');
+    el.glossaryExtractProgressBar = document.getElementById('glossaryExtractProgressBar');
+    el.glossaryExtractProgressText = document.getElementById('glossaryExtractProgressText');
 
     el.btnChat = document.getElementById('btnChat');
     el.chatSidebar = document.getElementById('chatSidebar');
@@ -4607,46 +4648,127 @@
     }
 
     function setGlossaryExtractBusy(busy){
-      if (!el.btnExtractGlossary) return;
-      el.btnExtractGlossary.textContent = busy ? '抽取中…' : '從原文抽取';
-      el.btnExtractGlossary.disabled = !!busy;
+      if (el.btnExtractGlossary){
+        el.btnExtractGlossary.textContent = busy ? '抽取中…' : '從原文抽取';
+        el.btnExtractGlossary.disabled = !!busy;
+      }
+      if (el.btnCancelGlossaryExtract){
+        el.btnCancelGlossaryExtract.hidden = !busy;
+        el.btnCancelGlossaryExtract.disabled = false;
+      }
+      if (el.btnDismissSuggestions) el.btnDismissSuggestions.hidden = !!busy;
+      if (el.glossaryExtractProgress) el.glossaryExtractProgress.hidden = !busy;
+      if (busy && el.glossarySuggestions) el.glossarySuggestions.style.display = '';
+    }
+
+    function updateGlossaryExtractProgress(completed, total, failed = 0){
+      if (el.glossaryExtractProgressBar){
+        el.glossaryExtractProgressBar.max = Math.max(1, total);
+        el.glossaryExtractProgressBar.value = Math.min(completed, total);
+      }
+      if (el.glossaryExtractProgressText){
+        el.glossaryExtractProgressText.textContent = total > 1
+          ? `${completed}/${total} 段${failed ? ` · 略過 ${failed}` : ''}`
+          : '處理中…';
+      }
+      if (el.glossarySuggestionLabel) el.glossarySuggestionLabel.textContent = 'AI 字彙抽取';
     }
 
     function dismissGlossarySuggestions(){
       if (el.suggestionList) el.suggestionList.innerHTML = '';
       if (el.glossarySuggestions) el.glossarySuggestions.style.display = 'none';
+      if (el.glossaryExtractProgressText) el.glossaryExtractProgressText.textContent = '';
     }
 
-    function addExtractedGlossaryTerm(src, tgt){
-      const srcKey = normalizeGlossaryTerm(src);
-      if (!srcKey || state.glossary.some(g => normalizeGlossaryTerm(g?.src) === srcKey)) return false;
+    function cancelGlossaryExtraction(silent = false){
+      const controller = state.glossaryController;
+      if (!controller) return false;
+      const restoreFocus = !silent && document.activeElement === el.btnCancelGlossaryExtract;
+      state.glossaryExtractGen++;
+      try { controller.abort(); } catch {}
+      if (state.glossaryController === controller) state.glossaryController = null;
+      setGlossaryExtractBusy(false);
+      dismissGlossarySuggestions();
+      if (restoreFocus) el.btnExtractGlossary?.focus({ preventScroll: true });
+      if (!silent) toast('已取消字彙抽取');
+      return true;
+    }
+
+    function isGlossaryExtractionActive(generation, controller){
+      return state.glossaryExtractGen === generation
+        && state.glossaryController === controller
+        && !controller.signal.aborted;
+    }
+
+    function createGlossaryAbortError(){
+      const error = new Error('Glossary extraction aborted');
+      error.name = 'AbortError';
+      return error;
+    }
+
+    function waitForGlossaryRetry(ms, signal){
+      return new Promise((resolve, reject) => {
+        if (signal.aborted){
+          reject(createGlossaryAbortError());
+          return;
+        }
+        const timer = setTimeout(() => {
+          signal.removeEventListener('abort', onAbort);
+          resolve();
+        }, ms);
+        const onAbort = () => {
+          clearTimeout(timer);
+          reject(createGlossaryAbortError());
+        };
+        signal.addEventListener('abort', onAbort, { once: true });
+      });
+    }
+
+    function getLargeGlossaryRejectMessage(reason){
+      if (reason === 'absolute-char-limit' || reason === 'token-limit') {
+        return '文字量超過單次字彙抽取上限，請分批處理。';
+      }
+      if (reason === 'chunk-limit') return `文字會切成超過 ${LARGE_TEXT_MAX_CHUNKS} 段，請分批處理。`;
+      return '文字量過大，請分批處理。';
+    }
+
+    function addExtractedGlossaryTerm(src, tgt, normalizeTerm = normalizeGlossaryTerm){
+      const srcKey = normalizeTerm(src);
+      if (!srcKey || state.glossary.some(g => normalizeTerm(g?.src) === srcKey)) return false;
       state.glossary.unshift({ src: String(src).trim(), tgt: String(tgt).trim() });
       persistGlossary();
       renderGlossary();
       return true;
     }
 
-    function renderGlossarySuggestions(rawTerms, targetLang){
+    function renderGlossarySuggestions(rawTerms, targetLang, options = {}){
       const list = el.suggestionList;
       if (!list || !el.glossarySuggestions) return 0;
       list.innerHTML = '';
-      const existing = new Set(state.glossary.map(g => normalizeGlossaryTerm(g?.src)).filter(Boolean));
+      const normalizeTerm = options.normalizeTerm || normalizeGlossaryTerm;
+      const maxTerms = options.maxTerms || GLOSSARY_MAX_TERMS;
+      const maxFieldChars = options.maxFieldChars || GLOSSARY_MAX_FIELD_CHARS;
+      const countFieldChars = options.countCodePoints ? value => Array.from(value).length : value => value.length;
+      const existing = new Set(state.glossary.map(g => normalizeTerm(g?.src)).filter(Boolean));
       const batch = new Set();
       const terms = [];
       for (const raw of Array.isArray(rawTerms) ? rawTerms : []){
         const source = String(raw?.source || '').trim();
         const translation = String(raw?.translation || '').trim();
-        const sourceKey = normalizeGlossaryTerm(source);
+        const sourceKey = normalizeTerm(source);
         if (!source || !translation) continue;
-        if (source.length > GLOSSARY_MAX_FIELD_CHARS || translation.length > GLOSSARY_MAX_FIELD_CHARS) continue;
+        if (countFieldChars(source) > maxFieldChars || countFieldChars(translation) > maxFieldChars) continue;
         if (existing.has(sourceKey) || batch.has(sourceKey)) continue;
         batch.add(sourceKey);
         terms.push({ source, translation });
-        if (terms.length >= GLOSSARY_MAX_TERMS) break;
+        if (terms.length >= maxTerms) break;
       }
 
       const targetLabel = LANGUAGES[targetLang]?.display || targetLang;
-      if (el.glossarySuggestionLabel) el.glossarySuggestionLabel.textContent = `AI 建議 · 譯入 ${targetLabel}（一鍵採用）`;
+      const summary = options.summary ? ` · ${options.summary}` : '';
+      if (el.glossarySuggestionLabel) {
+        el.glossarySuggestionLabel.textContent = `AI 建議 · 譯入 ${targetLabel}${summary}（一鍵採用）`;
+      }
       for (const term of terms){
         const item = document.createElement('div');
         item.className = 'suggestion-item';
@@ -4661,7 +4783,7 @@
         adopt.className = 'icon primary';
         adopt.textContent = '採用';
         adopt.addEventListener('click', () => {
-          if (!addExtractedGlossaryTerm(term.source, term.translation)){
+          if (!addExtractedGlossaryTerm(term.source, term.translation, normalizeTerm)){
             toast('該字彙已存在');
             return;
           }
@@ -4689,83 +4811,282 @@
       return parsed.terms;
     }
 
-    async function extractGlossaryFromSource(){
-      const sourceText = (el.src?.value || '').trim();
-      if (!sourceText){
-        toast('原文為空');
-        return;
-      }
-      if (!ensureApiKey(true)) return;
+    function buildGlossarySkipFragment(existingTerms){
+      return existingTerms.length
+        ? `\n\nAlready in glossary; skip these source terms: ${existingTerms.join(', ')}`
+        : '';
+    }
 
-      if (state.glossaryController){
-        try { state.glossaryController.abort(); } catch {}
-      }
-      const controller = new AbortController();
-      state.glossaryController = controller;
-      setGlossaryExtractBusy(true);
-      dismissGlossarySuggestions();
-
-      let lastText = '';
-      try {
-        const sourceLang = resolveSrcLang(sourceText);
-        const targetLang = getTargets(sourceLang)[0];
-        const existingTerms = state.glossary.map(g => String(g?.src || '').trim()).filter(Boolean).slice(0, 80);
-        const skipExisting = existingTerms.length ? `\n\nAlready in glossary; skip these source terms: ${existingTerms.join(', ')}` : '';
-        const systemPrompt = `You are a terminology extractor for a translator.
+    function buildShortGlossaryPrompt(sourceLang, targetLang, existingTerms){
+      return `You are a terminology extractor for a translator.
 - Extract 5-15 proper nouns, technical terms, brand names, product names, and repeated jargon from the source text.
 - Source language: ${LANGUAGES[sourceLang].promptName}.
 - Translate each term into target language: ${LANGUAGES[targetLang].promptName}.
 - Each source and translation field must be a concise term of at most ${GLOSSARY_MAX_FIELD_CHARS} characters, not a sentence.
 - Skip generic words, articles, prepositions, and common verbs.
 - Return ONLY valid JSON in this exact shape: {"terms":[{"source":"string","translation":"string"}]}.
-- No commentary and no markdown fences.${skipExisting}`;
-        const makeBody = (model) => ({
-          model,
-          temperature: 0.2,
-          max_completion_tokens: GLOSSARY_MAX_COMPLETION_TOKENS,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: sourceText },
-          ],
-        });
+- No commentary and no markdown fences.${buildGlossarySkipFragment(existingTerms)}`;
+    }
 
-        for (const model of modelChain(state.model)){
-          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${state.apiKey}`,
-            },
-            body: JSON.stringify(makeBody(model)),
-            signal: controller.signal,
-          });
-          if (!res.ok){
-            lastText = await safeReadText(res);
-            if (isInvalidModelError(res.status, lastText)) continue;
-            throw new Error(lastText || `HTTP ${res.status}`);
+    function buildLargeGlossaryPrompt(sourceLang, targetLang, existingTerms){
+      return `You are a terminology extractor for one section of a large document.
+- Extract at most ${LARGE_TEXT_CANDIDATES_PER_CHUNK} proper nouns, technical terms, brand names, product names, and repeated jargon.
+- Source language: ${LANGUAGES[sourceLang].promptName}.
+- Translate each term into target language: ${LANGUAGES[targetLang].promptName}.
+- Extract only terms that appear in PRIMARY TEXT. CONTEXT OVERLAP is context only.
+- Copy each source term exactly from PRIMARY TEXT; do not normalize or rewrite it.
+- Each source and translation must be a term of at most ${LARGE_TEXT_MAX_FIELD_CHARS} characters, not a sentence.
+- category must be one of: brand, product, proper noun, technical term, other jargon, unknown.
+- confidence must be a number from 0 to 1.
+- Return ONLY valid JSON in this exact shape: {"terms":[{"source":"string","translation":"string","category":"string","confidence":0.0}]}.
+- No commentary and no markdown fences.${buildGlossarySkipFragment(existingTerms)}`;
+    }
+
+    function createGlossaryRequestError(message, status){
+      const error = new Error(message);
+      if (Number.isFinite(status)) error.status = status;
+      return error;
+    }
+
+    async function requestGlossaryTerms(userText, systemPrompt, maxCompletionTokens, controller){
+      let lastText = '';
+      let lastStatus = 0;
+      for (const model of modelChain(state.model)){
+        const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            temperature: 0.2,
+            max_completion_tokens: maxCompletionTokens,
+            response_format: { type: 'json_object' },
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userText },
+            ],
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok){
+          lastStatus = res.status;
+          lastText = await safeReadText(res);
+          if (isInvalidModelError(res.status, lastText)) continue;
+          throw createGlossaryRequestError(lastText || `HTTP ${res.status}`, res.status);
+        }
+        if (model !== state.lastWorkingModel){
+          state.lastWorkingModel = model;
+          persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+        }
+        const json = await res.json();
+        const choice = json?.choices?.[0];
+        if (choice?.finish_reason === 'length'){
+          const truncated = createGlossaryRequestError('Glossary extraction truncated');
+          truncated.glossaryTruncated = true;
+          throw truncated;
+        }
+        return parseGlossaryExtraction(choice?.message?.content || '');
+      }
+      const error = createGlossaryRequestError(lastText || '所有模型都無法完成字彙抽取', lastStatus);
+      error.glossaryInvalidModels = true;
+      throw error;
+    }
+
+    function isRetryableGlossaryError(error){
+      return error?.status === 429
+        || (error?.status >= 500 && error?.status < 600)
+        || isApiNetworkError(error);
+    }
+
+    async function requestLargeGlossaryChunk(chunk, sourceLang, targetLang, existingTerms, controller){
+      const primaryOffset = chunk.primaryStartOffset - chunk.startOffset;
+      const overlapText = chunk.text.slice(0, primaryOffset);
+      const primaryText = chunk.text.slice(primaryOffset);
+      const userText = overlapText
+        ? `CONTEXT OVERLAP (context only):\n${overlapText}\n\nPRIMARY TEXT (extract terms from here):\n${primaryText}`
+        : `PRIMARY TEXT (extract terms from here):\n${primaryText}`;
+      const prompt = buildLargeGlossaryPrompt(sourceLang, targetLang, existingTerms);
+      let terms;
+      for (let attempt = 0; attempt <= LARGE_GLOSSARY_RETRY_LIMIT; attempt++){
+        try {
+          terms = await requestGlossaryTerms(
+            userText,
+            prompt,
+            LARGE_GLOSSARY_MAX_COMPLETION_TOKENS,
+            controller,
+          );
+          break;
+        } catch (error){
+          if (isAbortError(error) || controller.signal.aborted) throw error;
+          if (error?.glossaryTruncated || error?.glossaryInvalidModels) throw error;
+          if (attempt >= LARGE_GLOSSARY_RETRY_LIMIT || !isRetryableGlossaryError(error)) throw error;
+          await waitForGlossaryRetry(LARGE_GLOSSARY_RETRY_BACKOFF_MS, controller.signal);
+        }
+      }
+      const accepted = [];
+      for (const raw of Array.isArray(terms) ? terms : []){
+        if (typeof raw?.source !== 'string') continue;
+        const source = raw.source.trim();
+        const localOffset = source ? primaryText.indexOf(source) : -1;
+        if (localOffset < 0) continue;
+        accepted.push({
+          ...raw,
+          source,
+          firstOffset: chunk.primaryStartOffset + localOffset,
+        });
+      }
+      return accepted;
+    }
+
+    async function runLargeGlossaryPool(chunks, sourceLang, targetLang, existingTerms, generation, controller){
+      const results = new Array(chunks.length);
+      const successfulChunkIds = [];
+      const failures = [];
+      let nextIndex = 0;
+      let completed = 0;
+      const runWorker = async () => {
+        while (true){
+          if (!isGlossaryExtractionActive(generation, controller)) throw createGlossaryAbortError();
+          const index = nextIndex++;
+          if (index >= chunks.length) return;
+          const chunk = chunks[index];
+          try {
+            const terms = await requestLargeGlossaryChunk(
+              chunk,
+              sourceLang,
+              targetLang,
+              existingTerms,
+              controller,
+            );
+            if (!isGlossaryExtractionActive(generation, controller)) throw createGlossaryAbortError();
+            results[index] = { chunkId: chunk.chunkId, startOffset: chunk.primaryStartOffset, terms };
+            successfulChunkIds.push(chunk.chunkId);
+          } catch (error){
+            if (isAbortError(error) || !isGlossaryExtractionActive(generation, controller)) throw createGlossaryAbortError();
+            failures.push({ chunkId: chunk.chunkId, error });
+          } finally {
+            if (isGlossaryExtractionActive(generation, controller)){
+              completed++;
+              updateGlossaryExtractProgress(completed, chunks.length, failures.length);
+            }
           }
-          if (model !== state.lastWorkingModel){
-            state.lastWorkingModel = model;
-            persistConfig(STORAGE_KEYS.LAST_MODEL, model);
-          }
-          const json = await res.json();
-          const choice = json?.choices?.[0];
-          if (choice?.finish_reason === 'length'){
-            showTruncationWarning('字彙抽取');
-            const truncated = new Error('Glossary extraction truncated');
-            truncated.glossaryTruncated = true;
-            throw truncated;
-          }
-          const terms = parseGlossaryExtraction(choice?.message?.content || '');
-          const rendered = renderGlossarySuggestions(terms, targetLang);
-          if (!rendered) toast('未抽取到新字彙');
+        }
+      };
+      const workerCount = Math.min(LARGE_GLOSSARY_CONCURRENCY, chunks.length);
+      await Promise.all(Array.from({ length: workerCount }, () => runWorker()));
+      successfulChunkIds.sort(compareLargeTextChunkIds);
+      return { results: results.filter(Boolean), successfulChunkIds, failures };
+    }
+
+    async function extractShortGlossary(sourceText, sourceLang, targetLang, existingTerms, generation, controller){
+      updateGlossaryExtractProgress(0, 1);
+      const terms = await requestGlossaryTerms(
+        sourceText,
+        buildShortGlossaryPrompt(sourceLang, targetLang, existingTerms),
+        GLOSSARY_MAX_COMPLETION_TOKENS,
+        controller,
+      );
+      if (!isGlossaryExtractionActive(generation, controller)) throw createGlossaryAbortError();
+      updateGlossaryExtractProgress(1, 1);
+      const rendered = renderGlossarySuggestions(terms, targetLang);
+      if (!rendered) toast('未抽取到新字彙');
+    }
+
+    async function extractLargeGlossary(plan, sourceLang, targetLang, existingTerms, generation, controller){
+      updateGlossaryExtractProgress(0, plan.chunks.length);
+      const batch = await runLargeGlossaryPool(
+        plan.chunks,
+        sourceLang,
+        targetLang,
+        existingTerms,
+        generation,
+        controller,
+      );
+      if (!isGlossaryExtractionActive(generation, controller)) throw createGlossaryAbortError();
+      const truncatedCount = batch.failures.filter(item => item.error?.glossaryTruncated).length;
+      if (!batch.successfulChunkIds.length){
+        dismissGlossarySuggestions();
+        if (truncatedCount) showTruncationWarning('字彙抽取');
+        const firstError = batch.failures[0]?.error;
+        showError('大型字彙抽取失敗：' + formatApiError(firstError || '沒有段落完成'));
+        return;
+      }
+      const merged = mergeLargeGlossaryCandidates(batch.results, batch.successfulChunkIds);
+      const filtered = excludeExistingLargeGlossaryCandidates(merged, state.glossary);
+      const selected = selectLargeGlossaryCandidates(filtered, batch.successfulChunkIds);
+      const successCount = batch.successfulChunkIds.length;
+      const failedCount = batch.failures.length;
+      const summary = failedCount
+        ? `${successCount}/${plan.chunks.length} 段 · 略過 ${failedCount}`
+        : `${successCount} 段完成`;
+      const rendered = renderGlossarySuggestions(selected, targetLang, {
+        normalizeTerm: normalizeLargeGlossaryTerm,
+        maxTerms: LARGE_TEXT_FINAL_CANDIDATES,
+        maxFieldChars: LARGE_TEXT_MAX_FIELD_CHARS,
+        countCodePoints: true,
+        summary,
+      });
+      if (truncatedCount) showTruncationWarning('部分字彙抽取');
+      if (!rendered) toast('未抽取到新字彙');
+      else if (failedCount) toast(`字彙抽取完成，略過 ${failedCount} 段`);
+      else toast(`已完成 ${successCount} 段字彙抽取`, 'success');
+    }
+
+    async function extractGlossaryFromSource(){
+      const sourceText = (el.src?.value || '').trim();
+      if (!sourceText){
+        toast('原文為空');
+        return;
+      }
+      const plan = planLargeGlossaryText(sourceText);
+      if (plan.preflight.route === 'reject'){
+        showError(getLargeGlossaryRejectMessage(plan.preflight.reason));
+        return;
+      }
+      if (plan.preflight.warning === 'large-input') toast('文字量較大，將分段抽取。');
+      if (!ensureApiKey(true)) return;
+      if (state.glossaryController) cancelGlossaryExtraction(true);
+
+      const generation = ++state.glossaryExtractGen;
+      const controller = new AbortController();
+      state.glossaryController = controller;
+      dismissGlossarySuggestions();
+      setGlossaryExtractBusy(true);
+
+      try {
+        const sourceLang = resolveSrcLang(sourceText);
+        const targetLang = getTargets(sourceLang)[0];
+        const existingTerms = state.glossary.map(g => String(g?.src || '').trim()).filter(Boolean).slice(0, 80);
+        if (plan.preflight.route === 'short'){
+          await extractShortGlossary(
+            sourceText,
+            sourceLang,
+            targetLang,
+            existingTerms,
+            generation,
+            controller,
+          );
+        } else {
+          await extractLargeGlossary(
+            plan,
+            sourceLang,
+            targetLang,
+            existingTerms,
+            generation,
+            controller,
+          );
+        }
+      } catch (error){
+        if (isAbortError(error) || !isGlossaryExtractionActive(generation, controller)) return;
+        if (error?.glossaryTruncated){
+          dismissGlossarySuggestions();
+          showTruncationWarning('字彙抽取');
           return;
         }
-        throw new Error(lastText || '所有模型都無法完成字彙抽取');
-      } catch (e){
-        if (isAbortError(e) || e?.glossaryTruncated) return;
-        showError('抽取失敗：' + formatApiError(e));
+        dismissGlossarySuggestions();
+        showError('抽取失敗：' + formatApiError(error));
       } finally {
         if (state.glossaryController === controller){
           state.glossaryController = null;
@@ -4782,9 +5103,7 @@
         renderGlossary();
         if (typeof trapFocusIn === 'function') trapFocusIn(el.glossaryOverlay.querySelector('.modal'));
       } else {
-        if (state.glossaryController){
-          try { state.glossaryController.abort(); } catch {}
-        }
+        if (state.glossaryController) cancelGlossaryExtraction(true);
         if (typeof releaseFocusTrap === 'function') releaseFocusTrap();
         if (el.glossaryOverlay.contains(document.activeElement)) {
           document.activeElement.blur();
@@ -4806,6 +5125,7 @@
       const f = ev.target.files?.[0]; if (f) importGlossaryFile(f); ev.target.value = '';
     });
     el.btnExtractGlossary && el.btnExtractGlossary.addEventListener('click', () => { extractGlossaryFromSource().catch(() => {}); });
+    el.btnCancelGlossaryExtract && el.btnCancelGlossaryExtract.addEventListener('click', () => cancelGlossaryExtraction(false));
     el.btnDismissSuggestions && el.btnDismissSuggestions.addEventListener('click', dismissGlossarySuggestions);
 
     // Inject glossary fragment into translation prompts (wrap original buildSystemPrompt)
