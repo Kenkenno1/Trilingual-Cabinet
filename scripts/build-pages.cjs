@@ -99,6 +99,10 @@ function buildHtml(relativePath) {
 
 function shouldSkipInlineScript(attributes, code) {
   if (!code.trim()) return true;
+  // Third-party libraries opt out via data-no-obfuscate. Obfuscating public
+  // library code protects nothing, and control-flow flattening makes tight
+  // numeric loops (e.g. the MP3 encoder) tens of times slower.
+  if (/\bdata-no-obfuscate\b/i.test(attributes)) return true;
   const typeMatch = attributes.match(/\btype\s*=\s*["']([^"']+)["']/i);
   const type = (typeMatch?.[1] || '').toLowerCase();
   return ['application/json', 'application/ld+json', 'importmap', 'text/template'].includes(type);
