@@ -1891,6 +1891,7 @@
       <div class="field" id="ttsKeyField">
         <label for="ttsKey" id="ttsKeyLabel">Gemini API Key</label>
         <input class="in" id="ttsKey" type="password" placeholder="AIza…" autocomplete="off" />
+        <a class="api-key-help" id="ttsKeyLink" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">取得 Gemini API Key</a>
         <div class="hint" id="ttsKeyHint"></div>
       </div>
 
@@ -2929,6 +2930,7 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
       ttsKeyField: $('ttsKeyField'),
       ttsKeyLabel: $('ttsKeyLabel'),
       ttsKeyHint: $('ttsKeyHint'),
+      ttsKeyLink: $('ttsKeyLink'),
       btnSpeak1: $('btnSpeak1'),
       btnSpeak2: $('btnSpeak2'),
       stopFab: $('stopFab'),
@@ -4122,6 +4124,12 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
       const isCloud = mode === 'wavenet' || mode === 'chirp3';
       if (el.ttsKeyLabel) el.ttsKeyLabel.textContent = isCloud ? 'OAuth2 存取權杖' : 'Gemini API Key';
       if (el.ttsKey) el.ttsKey.placeholder = isCloud ? 'ya29.…' : 'AIza…';
+      if (el.ttsKeyLink) {
+        el.ttsKeyLink.href = isCloud
+          ? 'https://cloud.google.com/text-to-speech/docs/authentication'
+          : 'https://aistudio.google.com/app/apikey';
+        el.ttsKeyLink.textContent = isCloud ? '如何取得 OAuth2 存取權杖' : '取得 Gemini API Key';
+      }
       if (el.ttsKeyHint) {
         el.ttsKeyHint.innerHTML = isCloud
           ? 'Cloud TTS <b>不接受 API 金鑰</b>，只收 OAuth2 權杖。請執行 <code>gcloud auth print-access-token</code> 並貼上結果——權杖約 1 小時後失效，需重新取得。日常使用建議選 Gemini TTS。'
