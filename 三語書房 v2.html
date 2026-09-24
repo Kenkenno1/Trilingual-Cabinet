@@ -404,6 +404,86 @@
       color:var(--text);
       background:var(--rule-soft);
     }
+    /* ===== 照片／截圖 → 原文 ===== */
+    /* fixed 定位：跳出面板的 overflow:hidden，手機上矮面板也不會被切掉 */
+    .ocr-menu{ position:fixed; top:auto; left:auto; right:auto; width:min(300px, calc(100vw - 16px)); min-width:0; max-height:calc(100vh - 16px); overflow-y:auto; z-index:60; }
+    .ocr-menu .preedit-item[hidden]{ display:none; }
+    .ocr-tip{
+      margin-top:4px;
+      padding:7px 9px 4px;
+      border-top:1px solid var(--rule-soft);
+      color:var(--faint);
+      font-size:10.5px;
+      line-height:1.5;
+    }
+    #btnOcr.ocr-stop{
+      color:var(--text);
+      background:var(--dangerBg);
+      border-color:var(--dangerBd);
+    }
+    #srcPanel.ocring::before{
+      box-shadow:
+        0 0 12px var(--accent-src),
+        0 0 30px var(--accent-src-glow);
+    }
+    .ocr-drop{
+      position:absolute;
+      inset:10px;
+      z-index:35;
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      border:2px dashed var(--accent-src);
+      border-radius:var(--radius);
+      background:var(--toastBg);
+      color:var(--text);
+      font-size:15px;
+      font-weight:600;
+      text-align:center;
+      pointer-events:none;
+    }
+    .ocr-drop small{ color:var(--muted); font-size:12px; font-weight:400; }
+    #srcPanel.ocr-drag .ocr-drop{ display:flex; }
+    .ocr-badge{
+      position:absolute;
+      right:14px;
+      bottom:12px;
+      z-index:34;
+      padding:5px 11px;
+      border:1px solid var(--rule);
+      border-radius:999px;
+      background:var(--toastBg);
+      color:var(--text);
+      font-size:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.25);
+      pointer-events:none;
+    }
+    .ocr-badge:empty{ display:none; }
+    @media (max-width: 420px){
+      #srcPanel .actions .icon{ padding:5px 6px; }
+    }
+    @media (max-width: 380px){
+      #srcPanel .actions .icon{ padding:5px 4px; }
+    }
+    .ocr-viewer-list{ display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+    .ocr-viewer-list figure{
+      margin:0;
+      overflow:auto;
+      border:1px solid var(--rule-soft);
+      border-radius:var(--radius);
+      background:var(--panel-2);
+    }
+    .ocr-viewer-list img{ display:block; width:100%; height:auto; cursor:zoom-in; }
+    .ocr-viewer-list figure.zoom img{ width:auto; max-width:none; cursor:zoom-out; }
+    .ocr-viewer-list figcaption{
+      padding:6px 10px;
+      border-top:1px solid var(--rule-soft);
+      color:var(--faint);
+      font-size:11px;
+    }
+
     #srcPanel.preediting::before{
       box-shadow:
         0 0 12px var(--accent-src),
@@ -1798,6 +1878,19 @@
 </head>
 <body>
   <!-- v2: Glossary modal -->
+  <div class="overlay" id="ocrViewer" aria-hidden="true">
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="核對原圖">
+      <div class="modalHead">
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span class="modal-title">核對原圖</span>
+          <span class="modal-tag">點圖片可放大</span>
+        </div>
+        <button class="icon" id="btnCloseOcrViewer" aria-label="關閉原圖" title="Close">✕</button>
+      </div>
+      <div class="ocr-viewer-list" id="ocrViewerList"></div>
+    </div>
+  </div>
+
   <div class="overlay" id="glossaryOverlay" aria-hidden="true">
     <div class="modal modal-wide" role="dialog" aria-modal="true" aria-label="Glossary">
       <div class="modalHead">
@@ -1959,6 +2052,31 @@
             <span class="count" id="srcCount">0</span>
           </div>
           <div class="actions">
+            <div class="preedit-wrap" id="ocrWrap">
+              <button class="icon" id="btnOcr" type="button" aria-label="從照片或截圖讀取原文" aria-haspopup="menu" aria-expanded="false" title="從照片或截圖讀取原文">照片</button>
+              <div class="preedit-menu ocr-menu" id="ocrMenu" role="menu" aria-label="從圖片讀取原文">
+                <div class="preedit-section">從圖片讀取原文</div>
+                <button class="preedit-item" type="button" role="menuitem" data-ocr="camera" id="ocrItemCamera">
+                  <span class="preedit-item-title">📷 拍照</span>
+                  <span class="preedit-item-desc">用手機相機拍文件、書頁、菜單或告示</span>
+                </button>
+                <button class="preedit-item" type="button" role="menuitem" data-ocr="pick">
+                  <span class="preedit-item-title">🖼 選擇照片或截圖</span>
+                  <span class="preedit-item-desc">可一次選多張，會依序讀出、接在一起</span>
+                </button>
+                <button class="preedit-item" type="button" role="menuitem" data-ocr="paste" id="ocrItemPaste">
+                  <span class="preedit-item-title">📋 貼上剪貼簿的圖片</span>
+                  <span class="preedit-item-desc">剛截圖或複製的圖片，直接讀取</span>
+                </button>
+                <button class="preedit-item" type="button" role="menuitem" data-ocr="view" id="ocrItemView" hidden>
+                  <span class="preedit-item-title">🔍 核對原圖</span>
+                  <span class="preedit-item-desc" id="ocrViewDesc">對照剛才讀取的圖片</span>
+                </button>
+                <div class="ocr-tip" id="ocrTip"></div>
+              </div>
+              <input type="file" id="ocrCameraInput" accept="image/*" capture="environment" hidden>
+              <input type="file" id="ocrPickInput" accept="image/*" multiple hidden>
+            </div>
             <button class="icon" id="btnSpeakSrc" aria-label="Read aloud source text" title="朗讀原文">朗讀</button>
             <button class="icon" id="btnRecSrc" aria-label="Record source text as audio file" title="把朗讀存成音檔">錄製</button>
             <div class="preedit-wrap" id="preEditWrap">
@@ -1998,6 +2116,8 @@
           </div>
         </div>
         <textarea id="src" placeholder="Input…"></textarea>
+        <div class="ocr-drop" id="ocrDrop" aria-hidden="true">放開就能讀出圖片裡的文字<small>AI 只抄出原文，不會翻譯</small></div>
+        <div class="ocr-badge" id="srcStatus" aria-live="polite"></div>
       </section>
 
       <div class="grid-divider" id="gridDivider" title="Drag to resize source and translations"></div>
@@ -3120,7 +3240,7 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
     function updatePreEditControls() {
       if (!el.btnPreEdit) return;
       const hasSource = !!el.src.value.trim();
-      const disabled = state.busy || state.preEditing || !hasSource;
+      const disabled = state.busy || state.preEditing || state.ocring || !hasSource;
       el.btnPreEdit.disabled = disabled;
       if (disabled && el.preEditMenu) el.preEditMenu.classList.remove('show');
       el.btnPreEdit.textContent = state.preEditing ? '處理中' : '清理';
@@ -3131,7 +3251,7 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
     function setBusy(isBusy) {
       state.busy = isBusy;
       updateApiKeyPrompt();
-      el.btnTranslate.disabled = isBusy || state.preEditing || !el.src.value.trim();
+      el.btnTranslate.disabled = isBusy || state.preEditing || state.ocring || !el.src.value.trim();
 
       const out1Text = el.out1.textContent.trim();
       const out2Text = el.out2.textContent.trim();
@@ -3140,10 +3260,10 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
       el.btnRefine2.disabled = isBusy || state.refining[2] || !out2Text;
       el.btnReverse1.disabled = isBusy || !out1Text;
       el.btnReverse2.disabled = isBusy || !out2Text;
-      el.btnCopySrc.disabled = state.preEditing || !el.src.value.trim();
+      el.btnCopySrc.disabled = state.preEditing || state.ocring || !el.src.value.trim();
       el.btnCopy1.disabled = !out1Text;
       el.btnCopy2.disabled = !out2Text;
-      el.btnClear.disabled = state.preEditing || (!el.src.value.trim() && !out1Text && !out2Text);
+      el.btnClear.disabled = state.preEditing || state.ocring || (!el.src.value.trim() && !out1Text && !out2Text);
       updatePreEditControls();
 
       // Skeleton loading
@@ -4820,6 +4940,9 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
         try { state.preEditController.abort(); } catch (e) { console.warn('Pre-edit abort failed:', e.message); }
       }
       state.preEditController = null;
+      if (state.ocrController) {
+        try { state.ocrController.abort(); } catch (e) { console.warn('OCR abort failed:', e.message); }
+      }
       state.refining[1] = false;
       state.refining[2] = false;
       setBusy(false);
@@ -5027,8 +5150,525 @@ a.length>D&&(D=a.length,p=0|1.25*D+7200,r=new Int8Array(p));a=u.lame_encode_buff
       if (shouldTranslate) translateAll().catch(() => {});
     }
 
+    // ============================================================
+    // 照片／截圖 → 原文
+    // AI 只「抄出」圖片中的文字（不翻譯、不潤飾），寫進原文欄。
+    // 來源：手機拍照、選擇照片或截圖（可多張）、剪貼簿、Ctrl+V、拖放。
+    // ============================================================
+    const OCR = {
+      MAX_SIDE: 2560,        // detail:"original" 的長邊上限：書頁小字仍清楚，費用也不致失控
+      MAX_PIXELS: 6.5e6,
+      HIGH_SIDE: 2048,       // 模型不接受 original 時改送 high（官方上限 2048px／約 2.5MP）
+      HIGH_PIXELS: 2.5e6,
+      MAX_FILES: 10,
+      MAX_FILE_MB: 40,
+      JPEG_Q: 0.9,
+      MAX_TOKENS: 16000,
+    };
+    state.ocring = false;
+    state.ocrController = null;
+    state.ocrImages = [];    // [{ src, name }] 只留在記憶體，重新整理即清除
+
+    const ocrEl = {
+      wrap: $('ocrWrap'), btn: $('btnOcr'), menu: $('ocrMenu'),
+      camera: $('ocrCameraInput'), pick: $('ocrPickInput'),
+      itemCamera: $('ocrItemCamera'), itemPaste: $('ocrItemPaste'),
+      itemView: $('ocrItemView'), viewDesc: $('ocrViewDesc'), tip: $('ocrTip'),
+      status: $('srcStatus'),
+      viewer: $('ocrViewer'), viewerList: $('ocrViewerList'), viewerClose: $('btnCloseOcrViewer'),
+    };
+
+    const ocrIsTouch = (() => {
+      try { return matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
+      catch { return false; }
+    })();
+    ocrEl.itemCamera.hidden = !ocrIsTouch;
+    ocrEl.itemPaste.hidden = !(navigator.clipboard && typeof navigator.clipboard.read === 'function');
+    ocrEl.tip.textContent = ocrIsTouch
+      ? 'AI 只抄出圖片裡的文字，不會翻譯。讀完請先核對原文，再按「翻譯」。'
+      : 'AI 只抄出圖片裡的文字，不會翻譯。也可以在原文欄按 Ctrl+V 貼上截圖，或把圖片直接拖進原文欄。';
+
+    function setOcrMenu(show) {
+      const open = !!show && !state.ocring;
+      ocrEl.menu.classList.toggle('show', open);
+      ocrEl.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) return;
+      setPreEditMenu(false);
+      // 下方放不下就改放在按鈕上方
+      const r = ocrEl.btn.getBoundingClientRect();
+      const w = ocrEl.menu.offsetWidth, h = ocrEl.menu.offsetHeight;
+      const left = Math.max(8, Math.min(r.left, innerWidth - w - 8));
+      let top = r.bottom + 6;
+      if (top + h > innerHeight - 8) {
+        const above = r.top - 6 - h;
+        top = above >= 8 ? above : Math.max(8, innerHeight - 8 - h);
+      }
+      ocrEl.menu.style.left = `${left}px`;
+      ocrEl.menu.style.top = `${top}px`;
+    }
+
+    function updateOcrControls() {
+      ocrEl.btn.textContent = state.ocring ? '停止' : '照片';
+      ocrEl.btn.classList.toggle('ocr-stop', state.ocring);
+      ocrEl.btn.title = state.ocring ? '停止讀取圖片' : '從照片或截圖讀取原文';
+      ocrEl.btn.disabled = !state.ocring && state.preEditing;
+      el.srcPanel.classList.toggle('ocring', state.ocring);
+      const n = state.ocrImages.length;
+      ocrEl.itemView.hidden = n === 0;
+      ocrEl.viewDesc.textContent = n ? `對照剛才讀取的 ${n} 張圖片` : '';
+    }
+
+    function setOcrStatus(txt) {
+      if (ocrEl.status) ocrEl.status.textContent = txt || '';
+    }
+
+    function isImageFile(f) {
+      return !!f && (/^image\//i.test(f.type || '') || /\.(jpe?g|png|webp|gif|bmp|heic|heif|avif)$/i.test(f.name || ''));
+    }
+
+    function imageFilesFrom(dt) {
+      if (!dt) return [];
+      let files = Array.from(dt.files || []).filter(isImageFile);
+      if (!files.length && dt.items) {
+        files = Array.from(dt.items)
+          .filter(it => it.kind === 'file' && /^image\//i.test(it.type || ''))
+          .map(it => it.getAsFile())
+          .filter(Boolean);
+      }
+      return files;
+    }
+
+    function ocrError(msg) {
+      const e = new Error(msg);
+      e.userMsg = msg;
+      return e;
+    }
+
+    // 縮圖＋轉 JPEG：手機原圖常 3–8 MB，直接送既慢又貴；透明 PNG 墊白底避免黑底吃字
+    function drawScaled(source, w, h, maxSide, maxPixels) {
+      let scale = Math.min(1, maxSide / Math.max(w, h));
+      if (w * h * scale * scale > maxPixels) scale = Math.sqrt(maxPixels / (w * h));
+      const cw = Math.max(1, Math.round(w * scale));
+      const ch = Math.max(1, Math.round(h * scale));
+      const c = document.createElement('canvas');
+      c.width = cw;
+      c.height = ch;
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff';
+      g.fillRect(0, 0, cw, ch);
+      g.imageSmoothingEnabled = true;
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(source, 0, 0, cw, ch);
+      return { url: c.toDataURL('image/jpeg', OCR.JPEG_Q), w: cw, h: ch };
+    }
+
+    async function prepareOcrImage(file) {
+      const name = file.name || '圖片';
+      if (file.size > OCR.MAX_FILE_MB * 1024 * 1024) {
+        throw ocrError(`「${escapeHtmlText(name)}」超過 ${OCR.MAX_FILE_MB} MB，請先縮小或改用截圖。`);
+      }
+      const url = URL.createObjectURL(file);
+      let bitmap = null;
+      try {
+        let source = null, w = 0, h = 0;
+        if (typeof createImageBitmap === 'function') {
+          try {
+            bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+            source = bitmap; w = bitmap.width; h = bitmap.height;
+          } catch { bitmap = null; }
+        }
+        if (!source) {
+          const img = new Image();
+          try {
+            await new Promise((ok, bad) => { img.onload = ok; img.onerror = bad; img.src = url; });
+          } catch {
+            const heic = /\.(heic|heif)$/i.test(name) || /hei[cf]/i.test(file.type || '');
+            throw ocrError(heic
+              ? `「${escapeHtmlText(name)}」是 HEIC 格式，這個瀏覽器打不開。請改用截圖，或把 iPhone「設定 → 相機 → 格式」改成「最相容」。`
+              : `「${escapeHtmlText(name)}」無法開啟，請改用 JPG、PNG 或截圖。`);
+          }
+          source = img; w = img.naturalWidth; h = img.naturalHeight;
+        }
+        if (!w || !h) throw ocrError(`「${escapeHtmlText(name)}」無法開啟，請改用 JPG、PNG 或截圖。`);
+        return {
+          name,
+          original: drawScaled(source, w, h, OCR.MAX_SIDE, OCR.MAX_PIXELS),
+          high: drawScaled(source, w, h, OCR.HIGH_SIDE, OCR.HIGH_PIXELS),
+        };
+      } finally {
+        if (bitmap && bitmap.close) bitmap.close();
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    function ocrSystemPrompt() {
+      const lang = state.langOverride && state.langOverride !== 'auto' ? LANGUAGES[state.langOverride] : null;
+      const hint = lang
+        ? `\n- The text is expected to be mainly ${lang.promptName}, but transcribe every language exactly as it appears.`
+        : '';
+      return `You are a meticulous OCR transcription engine working for a professional translator.
+Task: copy out ALL readable text in the image exactly as written, in its original language(s).
+- NEVER translate, summarize, explain, correct or add anything. Output the transcription only: no preface, no notes, no Markdown, no code fences.
+- Keep every character exactly as printed. Do not convert Traditional <-> Simplified Chinese or old <-> new kanji forms. Keep full-width/half-width punctuation, numbers, units and symbols as printed.
+- Reading order: follow the natural reading order. In multi-column layouts finish one column before the next. Japanese/Chinese vertical writing (縦書き) is read top-to-bottom, with columns from right to left.
+- Line breaks: join lines that were broken only by the page width into one paragraph (Chinese/Japanese: join with no space; English and other spaced languages: join with a space and remove end-of-line hyphenation). Separate real paragraphs with one blank line. Keep headings, list items, captions and table rows on their own lines.
+- Tables: one row per line, cells separated by " | ".
+- Omit furigana/ruby readings printed beside kanji; keep only the base text.
+- Skip page numbers, running headers/footers and watermarks unless they are the only text.
+- Screenshots: ignore the phone status bar, app buttons, menus, input boxes and on-screen keyboards; transcribe the content. For chat screenshots write one message per line in order, prefixed with the sender name when it is shown ("Name: message"); skip timestamps and read receipts.
+- If part of the text is unreadable, write [?] in its place. Never guess words that are not visible.
+- If the image contains no readable text at all, output exactly: [NO_TEXT]${hint}`;
+    }
+
+    // 串流中先做輕度清理（去掉程式碼圍欄、[NO_TEXT]），讓使用者看到的是乾淨的字
+    function ocrDisplayText(t) {
+      let s = String(t || '').replace(/\r\n?/g, '\n');
+      s = s.replace(/^\s*```[a-z]*\s*\n?/i, '').replace(/\n?```\s*$/, '');
+      if (/^\s*\[?NO_TEXT\]?\s*$/i.test(s) || /^\s*\[NO_?T?E?X?T?$/i.test(s)) return '';
+      return s;
+    }
+
+    function cleanOcrText(t) {
+      return ocrDisplayText(t).trim().replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+    }
+
+    async function streamOcrImage(img, index, total, signal, onText) {
+      let detail = 'original';
+      let lastText = '';
+      let lastStatus = 0;
+      for (const model of modelChain(state.model)) {
+        for (;;) {
+          const pic = detail === 'original' ? img.original : img.high;
+          const body = {
+            model,
+            stream: true,
+            max_completion_tokens: OCR.MAX_TOKENS,
+            messages: [
+              { role: 'system', content: ocrSystemPrompt() },
+              {
+                role: 'user',
+                content: [
+                  { type: 'text', text: total > 1 ? `Image ${index + 1} of ${total}. Transcribe all of its text.` : 'Transcribe all of the text in this image.' },
+                  { type: 'image_url', image_url: { url: pic.url, detail } },
+                ],
+              },
+            ],
+          };
+          const res = await fetch(`${CONFIG.API_BASE}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.apiKey}`,
+            },
+            body: JSON.stringify(body),
+            signal,
+          });
+
+          if (!res.ok || !res.body) {
+            lastStatus = res.status;
+            lastText = await safeReadText(res);
+            if (detail === 'original' && res.status === 400 && /detail|original/i.test(lastText)) {
+              detail = 'high';           // 舊模型不認得 original → 改送 high 再試一次
+              continue;
+            }
+            break;
+          }
+
+          if (model !== state.lastWorkingModel) {
+            state.lastWorkingModel = model;
+            persistConfig(STORAGE_KEYS.LAST_MODEL, model);
+          }
+
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let buf = '';
+          let full = '';
+          let finish = '';
+          for (;;) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let nl;
+            while ((nl = buf.indexOf('\n')) >= 0) {
+              const line = buf.slice(0, nl).trim();
+              buf = buf.slice(nl + 1);
+              if (!line.startsWith('data:')) continue;
+              const data = line.slice(5).trim();
+              if (!data || data === '[DONE]') continue;
+              let json;
+              try { json = JSON.parse(data); } catch { continue; }
+              if (json.error) throw new Error(JSON.stringify(json));
+              const choice = json.choices && json.choices[0];
+              const piece = choice && choice.delta && choice.delta.content;
+              if (piece) {
+                full += piece;
+                onText(full);
+              }
+              if (choice && choice.finish_reason) finish = choice.finish_reason;
+            }
+          }
+          return { text: full, truncated: finish === 'length' };
+        }
+        if (!isInvalidModelError(lastStatus, lastText)) break;
+      }
+      throw new Error(lastText || `HTTP ${lastStatus || 0}`);
+    }
+
+    async function runOcr(fileList) {
+      let files = Array.from(fileList || []).filter(isImageFile);
+      if (!files.length) {
+        showError('請選擇圖片（JPG、PNG 或截圖）。');
+        return;
+      }
+      if (state.ocring || state.preEditing) return;
+      if (!ensureApiKey(true)) return;
+      if (files.length > OCR.MAX_FILES) {
+        toast(`一次最多讀 ${OCR.MAX_FILES} 張，先處理前 ${OCR.MAX_FILES} 張。`);
+        files = files.slice(0, OCR.MAX_FILES);
+      }
+      if (state.debounce) {
+        clearTimeout(state.debounce);
+        state.debounce = null;
+      }
+      abortInFlight();
+      if (state.speaking) stopSpeaking();
+      setOcrMenu(false);
+      setPreEditMenu(false);
+
+      const prevSrc = el.src.value;
+      const base = prevSrc.replace(/\s+$/, '');
+      const lead = base ? base + '\n\n' : '';   // 原文欄已有內容 → 接在後面，不覆蓋
+      if (!base) state.ocrImages = [];
+
+      state.ocring = true;
+      el.src.readOnly = true;
+      clearOutputs();
+      closeAllReverse();
+      updateOcrControls();
+      setBusy(false);
+
+      const controller = new AbortController();
+      state.ocrController = controller;
+      const show = (txt) => {
+        el.src.value = txt;
+        el.srcCount.textContent = String(txt.length);
+        el.src.scrollTop = el.src.scrollHeight;
+      };
+
+      let acc = '';
+      let ok = 0;
+      let empty = 0;
+      let truncated = false;
+      let aborted = false;
+      let failed = null;
+      try {
+        for (let i = 0; i < files.length; i++) {
+          setOcrStatus(files.length > 1 ? `讀取圖片 ${i + 1}/${files.length}…` : '讀取圖片…');
+          const img = await prepareOcrImage(files[i]);
+          if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError');
+          state.ocrImages.push({ src: img.original.url, name: img.name });
+          updateOcrControls();
+          const joiner = acc ? '\n\n' : '';
+          const r = await streamOcrImage(img, i, files.length, controller.signal,
+            (full) => show(lead + acc + joiner + ocrDisplayText(full)));
+          const text = cleanOcrText(r.text);
+          if (r.truncated) truncated = true;
+          if (text) { acc += joiner + text; ok++; } else { empty++; }
+          show(lead + acc);
+        }
+      } catch (e) {
+        if (isAbortError(e)) aborted = true;
+        else failed = e;
+      } finally {
+        state.ocring = false;
+        state.ocrController = null;
+        el.src.readOnly = false;
+        setOcrStatus('');
+      }
+
+      // 停止 → 保留畫面上已讀到的字；失敗 → 保留已完成的圖片
+      const finalText = aborted ? el.src.value : (acc ? lead + acc : prevSrc);
+      refreshSourceAfterEdit(finalText);
+      syncMirrorText();
+      updateOcrControls();
+      setBusy(false);
+
+      const changed = finalText !== prevSrc;
+      if (failed) showError('讀取圖片失敗：' + (failed.userMsg || formatApiError(failed)));
+      if (changed) {
+        const msg = aborted
+          ? '已停止，保留目前讀到的文字 '
+          : (files.length > 1 ? `已讀出 ${ok} 張圖片的文字，請核對後再翻譯 ` : '已讀出圖片文字，請核對後再翻譯 ');
+        toastUndo(msg, () => {
+          if (state.debounce) {
+            clearTimeout(state.debounce);
+            state.debounce = null;
+          }
+          abortInFlight();
+          refreshSourceAfterEdit(prevSrc);
+          syncMirrorText();
+        });
+        if (truncated) showTruncationWarning('圖片文字');
+        if (empty && ok) toast(`有 ${empty} 張圖片沒有讀到文字`);
+      } else if (!failed && !aborted && empty) {
+        showError(files.length > 1 ? '這些圖片裡沒有讀到文字。' : '這張圖片裡沒有讀到文字。');
+      }
+      if (changed && !aborted && !failed && state.auto) translateAll().catch(() => {});
+    }
+
+    async function pasteOcrFromClipboard() {
+      if (!navigator.clipboard || typeof navigator.clipboard.read !== 'function') {
+        toast('請在原文欄長按或按 Ctrl+V 貼上圖片');
+        return;
+      }
+      let files = [];
+      try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          const type = (item.types || []).find(t => /^image\//i.test(t));
+          if (!type) continue;
+          const blob = await item.getType(type);
+          const ext = (type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+          files.push(new File([blob], `剪貼簿圖片.${ext}`, { type }));
+        }
+      } catch (e) {
+        showError('無法讀取剪貼簿。請允許瀏覽器存取剪貼簿，或在原文欄直接按 Ctrl+V。');
+        return;
+      }
+      if (!files.length) {
+        showError('剪貼簿裡沒有圖片。先截圖或複製圖片，再按一次。');
+        return;
+      }
+      runOcr(files);
+    }
+
+    function openOcrViewer(show) {
+      if (show) {
+        ocrEl.viewerList.textContent = '';
+        state.ocrImages.forEach((im, i) => {
+          const fig = document.createElement('figure');
+          const img = document.createElement('img');
+          img.src = im.src;
+          img.alt = `第 ${i + 1} 張`;
+          img.addEventListener('click', () => fig.classList.toggle('zoom'));
+          const cap = document.createElement('figcaption');
+          cap.textContent = `第 ${i + 1} 張 · ${im.name}`;
+          fig.append(img, cap);
+          ocrEl.viewerList.append(fig);
+        });
+      }
+      ocrEl.viewer.classList.toggle('show', !!show);
+      ocrEl.viewer.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+
+    ocrEl.btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (state.ocring) {
+        if (state.ocrController) state.ocrController.abort();
+        return;
+      }
+      setOcrMenu(!ocrEl.menu.classList.contains('show'));
+    });
+    ocrEl.menu.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-ocr]');
+      if (!item || !ocrEl.menu.contains(item)) return;
+      e.stopPropagation();
+      const act = item.dataset.ocr;
+      setOcrMenu(false);
+      if (act === 'view') { openOcrViewer(true); return; }
+      if (!ensureApiKey(true)) return;   // 先確認金鑰，免得拍完照才被擋
+      if (act === 'camera') ocrEl.camera.click();
+      else if (act === 'pick') ocrEl.pick.click();
+      else if (act === 'paste') pasteOcrFromClipboard();
+    });
+    document.addEventListener('click', (e) => {
+      if (!ocrEl.wrap.contains(e.target)) setOcrMenu(false);
+    });
+    window.addEventListener('resize', () => setOcrMenu(false));
+    window.addEventListener('scroll', () => setOcrMenu(false), { passive: true });
+    for (const input of [ocrEl.camera, ocrEl.pick]) {
+      input.addEventListener('change', () => {
+        const files = Array.from(input.files || []);
+        input.value = '';
+        if (files.length) runOcr(files);
+      });
+    }
+
+    // 原文欄 Ctrl+V：剪貼簿只有圖片時才攔下來讀字；同時有文字（例如從 Word 複製）照常貼文字
+    el.src.addEventListener('paste', (e) => {
+      const files = imageFilesFrom(e.clipboardData);
+      if (!files.length) return;
+      const text = e.clipboardData.getData('text/plain');
+      if (text && text.trim()) return;
+      e.preventDefault();
+      if (!state.ocring) runOcr(files);
+    });
+    // 沒點進任何輸入框就按 Ctrl+V 的截圖，也送進原文欄
+    document.addEventListener('paste', (e) => {
+      if (e.defaultPrevented) return;
+      const t = e.target;
+      if (t && (t.closest?.('input, textarea, select, [contenteditable="true"], [contenteditable=""]'))) return;
+      const files = imageFilesFrom(e.clipboardData);
+      if (!files.length) return;
+      const text = e.clipboardData.getData('text/plain');
+      if (text && text.trim()) return;
+      e.preventDefault();
+      if (!state.ocring && !state.preEditing) runOcr(files);
+    });
+
+    // 拖放圖片到原文欄
+    let ocrDragDepth = 0;
+    const dragHasFiles = (e) => Array.from((e.dataTransfer && e.dataTransfer.types) || []).includes('Files');
+    el.srcPanel.addEventListener('dragenter', (e) => {
+      if (!dragHasFiles(e)) return;
+      e.preventDefault();
+      ocrDragDepth++;
+      if (!state.ocring) el.srcPanel.classList.add('ocr-drag');
+    });
+    el.srcPanel.addEventListener('dragover', (e) => {
+      if (!dragHasFiles(e)) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = state.ocring ? 'none' : 'copy';
+    });
+    el.srcPanel.addEventListener('dragleave', (e) => {
+      if (!dragHasFiles(e)) return;
+      ocrDragDepth = Math.max(0, ocrDragDepth - 1);
+      if (!ocrDragDepth) el.srcPanel.classList.remove('ocr-drag');
+    });
+    el.srcPanel.addEventListener('drop', (e) => {
+      if (!dragHasFiles(e)) return;
+      e.preventDefault();
+      ocrDragDepth = 0;
+      el.srcPanel.classList.remove('ocr-drag');
+      if (state.ocring || state.preEditing) return;
+      const files = imageFilesFrom(e.dataTransfer);
+      if (!files.length) {
+        showError('只能拖入圖片（JPG、PNG 或截圖）。');
+        return;
+      }
+      runOcr(files);
+    });
+    // 圖片沒放準、掉到面板外時，別讓瀏覽器直接打開圖片而離開 App（未存的譯文會不見）
+    window.addEventListener('dragover', (e) => { if (dragHasFiles(e)) e.preventDefault(); });
+    window.addEventListener('drop', (e) => { if (dragHasFiles(e)) e.preventDefault(); });
+
+    ocrEl.viewerClose.addEventListener('click', () => openOcrViewer(false));
+    ocrEl.viewer.addEventListener('click', (e) => { if (e.target === ocrEl.viewer) openOcrViewer(false); });
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (ocrEl.viewer.classList.contains('show')) {
+        openOcrViewer(false);
+        e.stopImmediatePropagation();
+      } else if (ocrEl.menu.classList.contains('show')) {
+        setOcrMenu(false);
+        e.stopImmediatePropagation();
+      }
+    }, true);
+    updateOcrControls();
+
     // --- Translation ---
     async function translateAll() {
+      if (state.ocring) return; // 圖片還在讀，原文尚未完成
       const text = (el.src.value || '').trim();
       hideSelectionTooltip();
 
